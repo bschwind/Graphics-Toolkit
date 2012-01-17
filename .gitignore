@@ -1,0 +1,10 @@
+*.user
+*.pdb
+*.exe
+*.cache
+*.FileListAbsolute.txt
+*.RuntimeProfile.txt
+*.xml
+*.cachefile
+*.xnb
+*-targetpath.txt
