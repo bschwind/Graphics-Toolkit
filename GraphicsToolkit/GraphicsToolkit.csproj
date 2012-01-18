@@ -97,8 +97,8 @@
     <Compile Include="Graphics\Camera2D.cs" />
     <Compile Include="Graphics\FirstPersonCamera.cs" />
     <Compile Include="Graphics\PrimitiveBatch.cs" />
+    <Compile Include="GUI\GUIManager.cs" />
     <Compile Include="GUI\Panel.cs" />
-    <Compile Include="GUI\﻿GUIManager.cs" />
     <Compile Include="Input\InputHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
