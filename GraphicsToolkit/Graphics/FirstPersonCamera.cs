@@ -23,6 +23,18 @@ namespace GraphicsToolkit.Graphics
         protected static Vector3 startUp = Vector3.Up;
         protected static Vector3 startDir = new Vector3(0, 0, -1);
 
+        public Vector3 Pos
+        {
+            get
+            {
+                return pos;
+            }
+            set
+            {
+                pos = value;
+            }
+        }
+
         /// <summary>
         /// Creates a new first person camera, centered at the origin, looking down the negative Z axis.
         /// </summary>

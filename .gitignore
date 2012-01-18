@@ -8,3 +8,4 @@
 *.cachefile
 *.xnb
 *-targetpath.txt
+*.dll

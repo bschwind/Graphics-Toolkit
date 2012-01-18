@@ -209,6 +209,28 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void DrawXZGrid(Vector3 start, Vector3 end, int widthSegments, int depthSegments, Color color)
+        {
+            start.X = Math.Min(start.X, end.X);
+            start.Z = Math.Min(start.Z, end.Z);
+
+            end.X = Math.Max(start.X, end.X);
+            end.Z = Math.Max(start.Z, end.Z);
+
+            float totalWidth = end.X-start.X;
+            float totalDepth = end.Z-start.Z;
+
+            for (int x = 0; x <= widthSegments; x++)
+            {
+                DrawLine(new Vector3(start.X + (x / (float)widthSegments) * totalWidth, start.Y, start.Z), new Vector3(start.X + (x / (float)widthSegments) * totalWidth, end.Y, end.Z), color);
+            }
+
+            for (int z = 0; z <= depthSegments; z++)
+            {
+                DrawLine(new Vector3(start.X, start.Y, start.Z + (z / (float)depthSegments) * totalDepth), new Vector3(end.X, end.Y, start.Z + (z / (float)depthSegments) * totalDepth), color);
+            }
+        }
+
         /// <summary>
         /// Draws a grid with specified width and height, in the positive XY plane
         /// </summary>
@@ -228,6 +250,28 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void DrawXYGrid(Vector3 start, Vector3 end, int widthSegments, int heightSegments, Color color)
+        {
+            start.X = Math.Min(start.X, end.X);
+            start.Z = Math.Min(start.Z, end.Z);
+
+            end.X = Math.Max(start.X, end.X);
+            end.Y = Math.Max(start.Y, end.Y);
+
+            float totalWidth = end.X - start.X;
+            float totalHeight = end.Y - start.Y;
+
+            for (int x = 0; x <= widthSegments; x++)
+            {
+                DrawLine(new Vector3(start.X + (x / (float)widthSegments) * totalWidth, start.Y, start.Z), new Vector3(start.X + (x / (float)widthSegments) * totalWidth, end.Y, end.Z), color);
+            }
+
+            for (int y = 0; y <= heightSegments; y++)
+            {
+                DrawLine(new Vector3(start.X, start.Y + (y / (float)heightSegments) * totalHeight, start.Z), new Vector3(end.X, start.Y + (y / (float)heightSegments) * totalHeight, end.Z), color);
+            }
+        }
+
         /// <summary>
         /// Draws a grid with specified width and height, in the positive YZ plane
         /// </summary>
@@ -244,6 +288,28 @@ namespace GraphicsToolkit.Graphics
             for (int z = 0; z <= depth; z++)
             {
                 DrawLine(new Vector3(0, 0, z), new Vector3(0, height, z), color);
+            }
+        }
+
+        public void DrawYZGrid(Vector3 start, Vector3 end, int heightSegments, int depthSegments, Color color)
+        {
+            start.Y = Math.Min(start.Y, end.Y);
+            start.Z = Math.Min(start.Z, end.Z);
+
+            end.Y = Math.Max(start.Y, end.Y);
+            end.Y = Math.Max(start.Y, end.Y);
+
+            float totalHeight = end.Y - start.Y;
+            float totalDepth = end.Y - start.Y;
+
+            for (int y = 0; y <= heightSegments; y++)
+            {
+                DrawLine(new Vector3(start.X, start.Y + (y / (float)heightSegments) * totalHeight, start.Z), new Vector3(end.X, start.Y + (y / (float)heightSegments) * totalHeight, end.Z), color);
+            }
+
+            for (int z = 0; z <= depthSegments; z++)
+            {
+                DrawLine(new Vector3(start.X, start.Y, start.Z + (z / (float)depthSegments) * totalDepth), new Vector3(end.X, end.Y, start.Z + (z / (float)depthSegments) * totalDepth), color);
             }
         }
 
@@ -276,6 +342,24 @@ namespace GraphicsToolkit.Graphics
             AddVertex(new VertexPositionColor(v3, color));
         }
 
+        public void FillTriangle(Vector3 v1, Vector3 v2, Vector3 v3, bool twoSided, Color color)
+        {
+            Vector3 normal = Vector3.Normalize(Vector3.Cross(v3 - v1, v2 - v1));
+
+            AddVertex(new VertexPositionColor(v1, color));
+            AddVertex(new VertexPositionColor(v2, color));
+            AddVertex(new VertexPositionColor(v3, color));
+
+            if (!twoSided)
+            {
+                return;
+            }
+
+            AddVertex(new VertexPositionColor(v1, color));
+            AddVertex(new VertexPositionColor(v3, color));
+            AddVertex(new VertexPositionColor(v2, color));
+        }
+
         public void FillTriangle(Vector2 v1, Vector2 v2, Vector2 v3, Color color)
         {
             AddVertex(new VertexPositionColor(new Vector3(v1, 0), color));
@@ -287,6 +371,12 @@ namespace GraphicsToolkit.Graphics
         {
             FillTriangle(v1, v2, v4, color);
             FillTriangle(v2, v3, v4, color);
+        }
+
+        public void FillQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, bool twoSided, Color color)
+        {
+            FillTriangle(v1, v2, v4, twoSided, color);
+            FillTriangle(v2, v3, v4, twoSided, color);
         }
 
         public void FillQuad(Vector2 v1, Vector2 v2, Vector2 v3, Vector2 v4, Color color)
