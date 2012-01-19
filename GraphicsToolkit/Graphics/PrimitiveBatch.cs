@@ -458,6 +458,36 @@ namespace GraphicsToolkit.Graphics
             device.DrawPrimitives(primType, offset, remainder / numVertsPerPrimitive(primType));
         }
 
+        public void DrawMesh(Mesh mesh, Camera cam)
+        {
+            device.SetVertexBuffer(mesh.Vertices);
+            device.Indices = mesh.Indices;
+            effect.View = currentCam.View;
+            effect.Projection = currentCam.Projection;
+            effect.VertexColorEnabled = false;
+            //effect.TextureEnabled = true;
+            effect.PreferPerPixelLighting = true;
+            effect.EnableDefaultLighting();
+
+            effect.CurrentTechnique.Passes[0].Apply();
+            int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
+            int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
+            int offset = 0;
+            for (int i = 0; i < passes; i++)
+            {
+                device.DrawPrimitives(PrimitiveType.TriangleList, offset, maxVertsPerDraw / numVertsPerPrimitive(PrimitiveType.TriangleList));
+                offset += maxVertsPerDraw;
+            }
+
+            //device.DrawPrimitives(PrimitiveType.TriangleList, offset, remainder / numVertsPerPrimitive(PrimitiveType.TriangleList));
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3);
+
+            effect.VertexColorEnabled = true;
+            effect.LightingEnabled = false;
+            //effect.TextureEnabled = false;
+            //effect.PreferPerPixelLighting = false;
+        }
+
         /// <summary>
         /// Finalizes the batch call
         /// </summary>
