@@ -114,8 +114,72 @@ namespace GraphicsToolkit.Graphics
 
         public void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, bool softEdge)
         {
-            AddTriangle(v1, v2, v4, softEdge);
-            AddTriangle(v2, v3, v4, softEdge);
+            if (softEdge)
+            {
+                AddTriangle(v1, v2, v4, softEdge);
+                AddTriangle(v2, v3, v4, softEdge);
+            }
+            else //This case is hard coded to save us from using two extra vertices when using quads
+            {
+                int aIndex, bIndex, cIndex, dIndex;
+
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(v3 - v1, v2 - v1));
+                hardVerts.Add(new VertexPositionNormalTexture(v1, normal, Vector2.Zero));
+                aIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v2, normal, Vector2.Zero));
+                bIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v3, normal, Vector2.Zero));
+                cIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v4, normal, Vector2.Zero));
+                dIndex = hardVerts.Count - 1;
+
+                hardTriangles.Add(new TriangleData(aIndex, bIndex, dIndex));
+                hardTriangles.Add(new TriangleData(bIndex, cIndex, dIndex));
+            }
+        }
+
+        public void AddCylinder(float radius, float height, int segments)
+        {
+            if (segments < 3)
+            {
+                throw new Exception("A cylinder must have at least 3 segments");
+            }
+
+            //Create the top cap. We can make this more efficient by indexing the middle vertex
+            for (int i = 0; i < segments; i++)
+            {
+                float yValue = height / 2;
+                float angle = ((float)i / segments) * MathHelper.TwoPi;
+                Vector3 v1 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                angle = ((float)(i + 1) / segments) * MathHelper.TwoPi;
+                Vector3 v2 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                AddTriangle(v1, v2, new Vector3(0, yValue, 0), false);
+            }
+
+            //Create the curved body
+            for (int i = 0; i < segments; i++)
+            {
+                float yValue = height / 2;
+
+                float angle = ((float)i / segments) * MathHelper.TwoPi;
+                Vector3 v1 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                Vector3 v2 = new Vector3((float)Math.Cos(angle) * radius, -yValue, (float)Math.Sin(angle) * radius);
+                angle = ((float)(i + 1) / segments) * MathHelper.TwoPi;
+                Vector3 v4 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                Vector3 v3 = new Vector3((float)Math.Cos(angle) * radius, -yValue, (float)Math.Sin(angle) * radius);
+                AddQuad(v1, v2, v3, v4, true);
+            }
+
+            //Create the top cap. We can make this more efficient by indexing the middle vertex
+            for (int i = 0; i < segments; i++)
+            {
+                float yValue = -height / 2;
+                float angle = ((float)i / segments) * MathHelper.TwoPi;
+                Vector3 v1 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                angle = ((float)(i + 1) / segments) * MathHelper.TwoPi;
+                Vector3 v2 = new Vector3((float)Math.Cos(angle) * radius, yValue, (float)Math.Sin(angle) * radius);
+                AddTriangle(new Vector3(0, yValue, 0), v2, v1, false);
+            }
         }
 
         private bool VerticesAreClose(Vector3 v1, Vector3 v2)
