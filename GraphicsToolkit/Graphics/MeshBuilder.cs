@@ -166,9 +166,9 @@ namespace GraphicsToolkit.Graphics
 
             for (int i = 0; i < hardTriangles.Count; i++)
             {
-                finalIndices[(i * 3) + (softTriangles.Count * 3)] = (short)hardTriangles[i].A;
-                finalIndices[(i * 3) + 1 + (softTriangles.Count * 3)] = (short)hardTriangles[i].B;
-                finalIndices[(i * 3) + 2 + (softTriangles.Count * 3)] = (short)hardTriangles[i].C;
+                finalIndices[(i * 3) + (softTriangles.Count * 3)] = (short)(hardTriangles[i].A + softVerts.Count);
+                finalIndices[(i * 3) + 1 + (softTriangles.Count * 3)] = (short)(hardTriangles[i].B + softVerts.Count);
+                finalIndices[(i * 3) + 2 + (softTriangles.Count * 3)] = (short)(hardTriangles[i].C + softVerts.Count);
             }
 
             VertexPositionNormalTexture[] finalVerts = new VertexPositionNormalTexture[softVerts.Count + hardVerts.Count];
