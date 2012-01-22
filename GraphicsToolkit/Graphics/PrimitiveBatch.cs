@@ -458,12 +458,13 @@ namespace GraphicsToolkit.Graphics
             device.DrawPrimitives(primType, offset, remainder / numVertsPerPrimitive(primType));
         }
 
-        public void DrawMesh(Mesh mesh, Camera cam)
+        public void DrawMesh(Mesh mesh, Matrix world, Camera cam)
         {
             device.SetVertexBuffer(mesh.Vertices);
             device.Indices = mesh.Indices;
             effect.View = currentCam.View;
             effect.Projection = currentCam.Projection;
+            effect.World = world;
             effect.VertexColorEnabled = false;
             //effect.TextureEnabled = true;
             effect.PreferPerPixelLighting = true;
