@@ -11,18 +11,9 @@ namespace GraphicsToolkit.GUI
     public class Panel
     {
         public static GraphicsDevice Device;
-        protected RenderTarget2D renderTarget;
         protected Vector2 upperLeft, bottomRight;
         protected int x, y, width, height;
         private Viewport viewPort;
-
-        public Texture2D PanelTexture
-        {
-            get
-            {
-                return renderTarget;
-            }
-        }
 
         public Viewport ViewPort
         {
@@ -99,11 +90,6 @@ namespace GraphicsToolkit.GUI
             width = (int)((botRight.X - upLeft.X) * Config.ScreenWidth);
             height = (int)((botRight.Y - upLeft.Y) * Config.ScreenHeight);
 
-            if (Device != null)
-            {
-                renderTarget = new RenderTarget2D(Device, (int)(width), (int)(height), false, SurfaceFormat.Color, DepthFormat.None, 4, RenderTargetUsage.DiscardContents);
-            }
-
             viewPort = new Viewport(x, y, width, height);
 
             OnRefresh();
@@ -126,20 +112,9 @@ namespace GraphicsToolkit.GUI
 
         }
 
-        public void BeginDraw()
-        {
-            Device.SetRenderTarget(renderTarget);
-        }
-
         public virtual void Draw(GameTime g)
         {
 
-        }
-
-        public Texture2D EndDraw()
-        {
-            Device.SetRenderTarget(null);
-            return renderTarget;
         }
     }
 }

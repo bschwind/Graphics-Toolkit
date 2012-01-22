@@ -9,7 +9,7 @@ namespace GraphicsToolkit.GUI
 {
     public class GUIManager : DrawableGameComponent
     {
-        public Color BackgroundColor = Color.Red;
+        public Color BackgroundColor = Color.Black;
         private List<Panel> panels;
         private List<Texture2D> panelTextures;
         private SpriteBatch spriteBatch;
@@ -85,23 +85,29 @@ namespace GraphicsToolkit.GUI
         {
             base.Draw(gameTime);
             //Render the panels to textures
-            foreach (Panel p in panels)
+            /*foreach (Panel p in panels)
             {
                 p.BeginDraw();
                 p.Draw(gameTime);
                 p.EndDraw();
-            }
+            }*/
 
             //Clear the screen
             Game.GraphicsDevice.Clear(BackgroundColor);
 
+            foreach (Panel p in panels)
+            {
+                Game.GraphicsDevice.Viewport = p.ViewPort;
+                p.Draw(gameTime);
+            }
+
             //Draw our panel textures
-            spriteBatch.Begin();
+            /*spriteBatch.Begin();
             foreach (Panel p in panels)
             {
                 spriteBatch.Draw(p.PanelTexture, p.ScreenRect, Color.White);
             }
-            spriteBatch.End();
+            spriteBatch.End();*/
         }
     }
 }

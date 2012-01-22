@@ -460,6 +460,8 @@ namespace GraphicsToolkit.Graphics
 
         public void DrawMesh(Mesh mesh, Matrix world, Camera cam)
         {
+            Matrix previousWorld = effect.World;
+
             device.SetVertexBuffer(mesh.Vertices);
             device.Indices = mesh.Indices;
             effect.View = currentCam.View;
@@ -485,6 +487,7 @@ namespace GraphicsToolkit.Graphics
 
             effect.VertexColorEnabled = true;
             effect.LightingEnabled = false;
+            effect.World = previousWorld;
             //effect.TextureEnabled = false;
             //effect.PreferPerPixelLighting = false;
         }
