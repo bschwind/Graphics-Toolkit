@@ -99,6 +99,9 @@
     <Compile Include="Graphics\Mesh.cs" />
     <Compile Include="Graphics\MeshBuilder.cs" />
     <Compile Include="Graphics\PrimitiveBatch.cs" />
+    <Compile Include="Graphics\SceneGraph\MeshNode.cs" />
+    <Compile Include="Graphics\SceneGraph\SceneGraph.cs" />
+    <Compile Include="Graphics\SceneGraph\SceneNode.cs" />
     <Compile Include="Graphics\TriangleData.cs" />
     <Compile Include="GUI\GUIManager.cs" />
     <Compile Include="GUI\Panel.cs" />
