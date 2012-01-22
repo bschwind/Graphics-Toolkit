@@ -10,8 +10,9 @@ namespace GraphicsToolkit.Graphics.SceneGraph
     public class SceneNode
     {
         private List<SceneNode> children;
-        private Matrix localTransform;
+        private Matrix localTransform, pivotTransform;
         private Vector3 pos, scl;
+        private Vector3 pivot;
         private Quaternion rot;
 
         public SceneNode()
@@ -20,6 +21,8 @@ namespace GraphicsToolkit.Graphics.SceneGraph
             pos = Vector3.Zero;
             scl = Vector3.One;
             rot = Quaternion.Identity;
+
+            SetPivot(Vector3.Zero);
         }
 
         public void AddChild(SceneNode n)
@@ -47,15 +50,21 @@ namespace GraphicsToolkit.Graphics.SceneGraph
             rot = q;
         }
 
+        public void SetPivot(Vector3 p)
+        {
+            pivot = p;
+            pivotTransform = Matrix.CreateTranslation(-pivot);
+        }
+
         public void Draw(GameTime g, Matrix parentTransform, PrimitiveBatch batch, Camera cam)
         {
             localTransform = Matrix.CreateScale(scl) * Matrix.CreateFromQuaternion(rot) * Matrix.CreateTranslation(pos);
-            Matrix finalTransform = localTransform * parentTransform;
+            Matrix finalTransform = pivotTransform * localTransform * parentTransform;
             InternalDraw(g, finalTransform, batch, cam);
 
             foreach (SceneNode n in children)
             {
-                n.Draw(g, finalTransform, batch, cam);
+                n.Draw(g,  Matrix.Invert(pivotTransform) * finalTransform, batch, cam);
             }
         }
 
