@@ -43,7 +43,7 @@ namespace GraphicsToolkit.Graphics
         {
             if (hasBegun)
             {
-                throw new Exception("Can't call Begin until current batch has ended");
+                throw new Exception("Can't call Begin until current mesh has ended");
             }
 
             softVerts.Clear();
@@ -52,6 +52,26 @@ namespace GraphicsToolkit.Graphics
             hardTriangles.Clear();
 
             hasBegun = true;
+        }
+
+        public void OffsetAllVerts(Vector3 offset)
+        {
+            if (!hasBegun)
+            {
+                throw new Exception("Can't offset verts without beginning a new mesh");
+            }
+
+            for (int i = 0; i < softVerts.Count; i++)
+            {
+                VertexPositionNormalTexture vert = softVerts[i];
+                softVerts[i] = new VertexPositionNormalTexture(vert.Position + offset, vert.Normal, vert.TextureCoordinate);
+            }
+
+            for (int i = 0; i < hardVerts.Count; i++)
+            {
+                VertexPositionNormalTexture vert = hardVerts[i];
+                hardVerts[i] = new VertexPositionNormalTexture(vert.Position + offset, vert.Normal, vert.TextureCoordinate);
+            }
         }
 
         public void AddTriangle(Vector3 a, Vector3 b, Vector3 c, bool softEdge)
@@ -138,6 +158,23 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void AddBox(float width, float height, float depth)
+        {
+            AddQuad(new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), false);
+            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false);
+            AddQuad(new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), false);
+            AddQuad(new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), false);
+            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), false);
+            AddQuad(new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false);
+        }
+
+        public Mesh CreateBox(float width, float height, float depth)
+        {
+            Begin();
+            AddBox(width, height, depth);
+            return End();
+        }
+
         public void AddCylinder(float radius, float height, int segments)
         {
             if (segments < 3)
@@ -182,6 +219,42 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public Mesh CreateCylinder(float radius, float height, int segments)
+        {
+            Begin();
+            AddCylinder(radius, height, segments);
+            return End();
+        }
+
+        public void AddSphere(float radius, int radialSegments, int verticalSegments)
+        {
+            for (int i = 0; i < verticalSegments; i++)
+            {
+                float bodyAngle = ((float)i / verticalSegments) * MathHelper.Pi;
+                float nextBodyAngle = ((float)(i+1) / verticalSegments) * MathHelper.Pi;
+
+                for (int j = 0; j < radialSegments; j++)
+                {
+                    float radialAngle = ((float)j / radialSegments) * MathHelper.TwoPi;
+                    float nextRadialAngle = ((float)(j+1) / radialSegments) * MathHelper.TwoPi;
+
+                    Vector3 v1 = new Vector3(radius * (float)(Math.Cos(radialAngle) * Math.Sin(bodyAngle)), radius * (float)Math.Cos(bodyAngle), radius * (float)(Math.Sin(-radialAngle) * Math.Sin(bodyAngle)));
+                    Vector3 v2 = new Vector3(radius * (float)(Math.Cos(nextRadialAngle) * Math.Sin(bodyAngle)), radius * (float)Math.Cos(bodyAngle), radius * (float)(Math.Sin(-nextRadialAngle) * Math.Sin(bodyAngle)));
+                    Vector3 v3 = new Vector3(radius * (float)(Math.Cos(nextRadialAngle) * Math.Sin(nextBodyAngle)), radius * (float)Math.Cos(nextBodyAngle), radius * (float)(Math.Sin(-nextRadialAngle) * Math.Sin(nextBodyAngle)));
+                    Vector3 v4 = new Vector3(radius * (float)(Math.Cos(radialAngle) * Math.Sin(nextBodyAngle)), radius * (float)Math.Cos(nextBodyAngle), radius * (float)(Math.Sin(-radialAngle) * Math.Sin(nextBodyAngle)));
+
+                    AddQuad(v1, v2, v3, v4, true);
+                }
+            }
+        }
+
+        public Mesh CreateSphere(float radius, int radialSegments, int verticalSegments)
+        {
+            Begin();
+            AddSphere(radius, radialSegments, verticalSegments);
+            return End();
+        }
+
         private bool VerticesAreClose(Vector3 v1, Vector3 v2)
         {
             float threshold = 0.001f;
@@ -199,7 +272,7 @@ namespace GraphicsToolkit.Graphics
         {
             if (!hasBegun)
             {
-                throw new Exception("Can't end a batch without beginning it!");
+                throw new Exception("Can't end a mesh without beginning it!");
             }
 
             hasBegun = false;
@@ -258,19 +331,6 @@ namespace GraphicsToolkit.Graphics
             m.Vertices = vBuffer;
             
             return m;
-        }
-
-        private static int numVertsPerPrimitive(PrimitiveType type)
-        {
-            switch (type)
-            {
-                case PrimitiveType.LineList:
-                    return 2;
-                case PrimitiveType.TriangleList:
-                    return 3;
-                default:
-                    throw new Exception("PrimitiveDrawer doesn't support " + type.ToString());
-            }
         }
     }
 }

@@ -464,8 +464,8 @@ namespace GraphicsToolkit.Graphics
 
             device.SetVertexBuffer(mesh.Vertices);
             device.Indices = mesh.Indices;
-            effect.View = currentCam.View;
-            effect.Projection = currentCam.Projection;
+            effect.View = cam.View;
+            effect.Projection = cam.Projection;
             effect.World = world;
             effect.VertexColorEnabled = false;
             //effect.TextureEnabled = true;
