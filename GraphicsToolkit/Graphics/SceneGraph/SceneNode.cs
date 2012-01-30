@@ -40,6 +40,11 @@ namespace GraphicsToolkit.Graphics.SceneGraph
             pos = p;
         }
 
+        public Vector3 GetPos()
+        {
+            return pos;
+        }
+
         public void SetScl(Vector3 s)
         {
             scl = s;

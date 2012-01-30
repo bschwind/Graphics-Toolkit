@@ -190,6 +190,40 @@ namespace GraphicsToolkit.Graphics
             AddVertex(new VertexPositionColor(new Vector3(center, 0), color));
         }
 
+        public void DrawPlane(Plane p, Color color)
+        {
+            Vector3 normal = Vector3.Normalize(p.Normal);
+
+            Vector3 perpVec = Vector3.Normalize(Vector3.Cross(Vector3.Up, normal));
+            Quaternion rot;
+            if (Math.Abs(Math.Abs(Vector3.Dot(Vector3.Up, normal)) - 1) <= float.Epsilon)
+            {
+                rot = Quaternion.Identity;
+            }
+            else
+            {
+                rot = Quaternion.CreateFromAxisAngle(perpVec, (float)Math.Acos(Vector3.Dot(Vector3.Up, normal)));
+            }
+            
+
+            Vector3 v1 = Vector3.Transform(new Vector3(-1, 0, -1), rot);
+            Vector3 v2 = Vector3.Transform(new Vector3(1, 0, -1), rot);
+            Vector3 v3 = Vector3.Transform(new Vector3(1, 0, 1), rot);
+            Vector3 v4 = Vector3.Transform(new Vector3(-1, 0, 1), rot);
+
+            v1 += (normal * p.D);
+            v2 += (normal * p.D);
+            v3 += (normal * p.D);
+            v4 += (normal * p.D);
+
+            DrawLine(v1, v2, color);
+            DrawLine(v2, v3, color);
+            DrawLine(v3, v4, color);
+            DrawLine(v4, v1, color);
+
+            DrawLine(normal*p.D, normal*p.D + normal, Color.Red);
+        }
+
         /// <summary>
         /// Draws a grid with specified width and depth, in the positive XZ plane
         /// </summary>
