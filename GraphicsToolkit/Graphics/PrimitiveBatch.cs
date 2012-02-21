@@ -154,21 +154,48 @@ namespace GraphicsToolkit.Graphics
 
         public void DrawCircle(Vector2 center, float radius, int segments, Color color)
         {
-            int iterations = segments;
-
-            Vector3 prevPos = new Vector3(center, 0) + new Vector3(radius, 0, 0);
-
-            for (int i = 0; i < iterations; i++)
+            /*for (int i = 0; i < segments; i++)
             {
-                float angle = ((float)i / iterations) * MathHelper.TwoPi;
+                float angle = ((float)i / segments) * MathHelper.TwoPi;
+                float nextAngle = ((float)(i+1) / segments) * MathHelper.TwoPi;
                 Vector3 pos = new Vector3(center, 0) + new Vector3((float)Math.Cos(angle) * radius, (float)Math.Sin(angle) * radius, 0);
-                AddVertex(new VertexPositionColor(prevPos, color));
+                Vector3 nextPos = new Vector3(center, 0) + new Vector3((float)Math.Cos(nextAngle) * radius, (float)Math.Sin(nextAngle) * radius, 0);
                 AddVertex(new VertexPositionColor(pos, color));
-                prevPos = pos;
+                AddVertex(new VertexPositionColor(nextPos, color));
+            }*/
+
+            DrawRotatedCircle(center, radius, segments, 0f, color);
+        }
+
+        public void DrawRotatedCircle(Vector2 center, float radius, int segments, float rotation, Color color)
+        {
+            Vector3 newC = new Vector3(center, 0);
+
+            for (int i = 0; i < segments; i++)
+            {
+                float angle = (((float)i / segments) * MathHelper.TwoPi) + rotation;
+                float nextAngle = (((float)(i + 1) / segments) * MathHelper.TwoPi) + rotation;
+                Vector3 pos = newC + new Vector3((float)Math.Cos(angle) * radius, (float)Math.Sin(angle) * radius, 0);
+                Vector3 nextPos = newC + new Vector3((float)Math.Cos(nextAngle) * radius, (float)Math.Sin(nextAngle) * radius, 0);
+                AddVertex(new VertexPositionColor(pos, color));
+                AddVertex(new VertexPositionColor(nextPos, color));
             }
 
-            AddVertex(new VertexPositionColor(prevPos, color));
-            AddVertex(new VertexPositionColor(new Vector3(center, 0) + new Vector3(radius, 0, 0), color));
+            Vector3 horizontal = new Vector3((float)Math.Cos(rotation) * radius, (float)Math.Sin(rotation) * radius, 0);
+            Vector3 vertical = new Vector3(-horizontal.Y, horizontal.X, 0);
+
+            AddVertex(new VertexPositionColor(newC + horizontal, color));
+            AddVertex(new VertexPositionColor(newC - horizontal, color));
+
+            AddVertex(new VertexPositionColor(newC + vertical, color));
+            AddVertex(new VertexPositionColor(newC - vertical, color));
+        }
+
+        public void DrawAABB(Vector2 pos, Vector2 extents, Color color)
+        {
+            DrawLine(pos + new Vector2(-extents.X, extents.Y), pos + extents, color);
+            DrawLine(pos + extents, pos + new Vector2(extents.X, -extents.Y), color);
+            //TODO: DrawLine(pos + new Vector2(extents.X, -extents.Y), 
         }
 
         public void DrawPie(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)
