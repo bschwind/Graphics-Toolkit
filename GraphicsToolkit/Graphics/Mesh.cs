@@ -12,5 +12,18 @@ namespace GraphicsToolkit.Graphics
         public VertexBuffer Vertices;
         public IndexBuffer Indices;
         public Texture2D Texture;
+
+        public BoundingSphere CalculateBounds()
+        {
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[Vertices.VertexCount];
+            Vertices.GetData<VertexPositionNormalTexture>(verts);
+            List<Vector3> points = new List<Vector3>();
+            for (int i = 0; i < verts.Length; i++)
+            {
+                points.Add(verts[i].Position);
+            }
+
+            return BoundingSphere.CreateFromPoints(points);
+        }
     }
 }
