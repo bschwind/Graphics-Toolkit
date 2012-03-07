@@ -195,7 +195,8 @@ namespace GraphicsToolkit.Graphics
         {
             DrawLine(pos + new Vector2(-extents.X, extents.Y), pos + extents, color);
             DrawLine(pos + extents, pos + new Vector2(extents.X, -extents.Y), color);
-            //TODO: DrawLine(pos + new Vector2(extents.X, -extents.Y), 
+            DrawLine(pos + new Vector2(extents.X, -extents.Y), pos - extents, color);
+            DrawLine(pos - extents, pos + new Vector2(-extents.X, extents.Y), color);
         }
 
         public void DrawPie(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)

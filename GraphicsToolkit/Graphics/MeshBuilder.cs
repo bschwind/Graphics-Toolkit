@@ -158,14 +158,40 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, bool softEdge, Vector2 startTex, Vector2 endTex)
+        {
+            if (softEdge)
+            {
+                AddTriangle(v1, v2, v4, softEdge);
+                AddTriangle(v2, v3, v4, softEdge);
+            }
+            else //This case is hard coded to save us from using two extra vertices when using quads
+            {
+                int aIndex, bIndex, cIndex, dIndex;
+
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(v3 - v1, v2 - v1));
+                hardVerts.Add(new VertexPositionNormalTexture(v1, normal, startTex));
+                aIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v2, normal, new Vector2(startTex.X+(endTex.X-startTex.X), startTex.Y)));
+                bIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v3, normal, endTex));
+                cIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v4, normal, new Vector2(startTex.X, startTex.Y + (endTex.Y-startTex.Y))));
+                dIndex = hardVerts.Count - 1;
+
+                hardTriangles.Add(new TriangleData(aIndex, bIndex, dIndex));
+                hardTriangles.Add(new TriangleData(bIndex, cIndex, dIndex));
+            }
+        }
+
         public void AddBox(float width, float height, float depth)
         {
-            AddQuad(new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), false);
-            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false);
-            AddQuad(new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), false);
-            AddQuad(new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), false);
-            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), false);
-            AddQuad(new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false);
+            AddQuad(new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), false, Vector2.Zero, Vector2.One);
+            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false, Vector2.Zero, Vector2.One);
+            AddQuad(new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), false, Vector2.Zero, Vector2.One);
+            AddQuad(new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), false, Vector2.Zero, Vector2.One);
+            AddQuad(new Vector3(-(width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), -(depth / 2)), new Vector3((width / 2), (height / 2), (depth / 2)), new Vector3(-(width / 2), (height / 2), (depth / 2)), false, Vector2.Zero, Vector2.One);
+            AddQuad(new Vector3(-(width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), (depth / 2)), new Vector3((width / 2), -(height / 2), -(depth / 2)), new Vector3(-(width / 2), -(height / 2), -(depth / 2)), false, Vector2.Zero, Vector2.One);
         }
 
         public Mesh CreateBox(float width, float height, float depth)
