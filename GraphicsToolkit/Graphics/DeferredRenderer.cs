@@ -66,7 +66,8 @@ namespace GraphicsToolkit.Graphics
             DeferredEffect.Parameters["View"].SetValue(cam.View);
             DeferredEffect.Parameters["Projection"].SetValue(cam.Projection);
 
-            device.SetRenderTarget(colorTarget);
+            //device.SetRenderTarget(colorTarget);
+            device.SetRenderTargets(colorTarget, normalTarget, depthTarget);
 
             foreach (Mesh m in meshes)
             {
