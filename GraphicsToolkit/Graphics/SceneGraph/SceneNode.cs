@@ -60,6 +60,11 @@ namespace GraphicsToolkit.Graphics.SceneGraph
             rot = q;
         }
 
+        public Quaternion GetRotation()
+        {
+            return rot;
+        }
+
         public void SetPivot(Vector3 p)
         {
             pivot = p;

@@ -23,7 +23,9 @@ namespace GraphicsToolkit.Graphics
                 points.Add(verts[i].Position);
             }
 
-            return BoundingSphere.CreateFromPoints(points);
+            BoundingSphere s = BoundingSphere.CreateFromPoints(points);
+            s.Radius += 0.08f;
+            return s;
         }
     }
 }

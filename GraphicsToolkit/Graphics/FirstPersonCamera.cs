@@ -22,6 +22,7 @@ namespace GraphicsToolkit.Graphics
         private Vector3 pos, dir, up, left;
         protected static Vector3 startUp = Vector3.Up;
         protected static Vector3 startDir = new Vector3(0, 0, -1);
+        private Vector2 mouseDelta;
 
         public Vector3 Pos
         {
@@ -32,6 +33,14 @@ namespace GraphicsToolkit.Graphics
             set
             {
                 pos = value;
+            }
+        }
+
+        public Vector2 MouseDelta
+        {
+            get
+            {
+                return mouseDelta;
             }
         }
 
@@ -93,6 +102,7 @@ namespace GraphicsToolkit.Graphics
             int currentY = mState.Y;
             int dx = currentX - lastMouseX;
             int dy = currentY - lastMouseY;
+            mouseDelta = new Vector2(dx, dy);
 
             xRot -= dy * turnSpeed * dt;
             xRot = MathHelper.Clamp(xRot, -MathHelper.PiOver2, MathHelper.PiOver2);
