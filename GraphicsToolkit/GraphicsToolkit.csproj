@@ -106,6 +106,31 @@
     <Compile Include="GUI\GUIManager.cs" />
     <Compile Include="GUI\Panel.cs" />
     <Compile Include="Input\InputHandler.cs" />
+    <Compile Include="Physics\2D\Bodies\CircleBody.cs" />
+    <Compile Include="Physics\2D\Bodies\LineBody.cs" />
+    <Compile Include="Physics\2D\Bodies\RigidBody2D.cs" />
+    <Compile Include="Physics\2D\Constraints\Constraint2D.cs" />
+    <Compile Include="Physics\2D\Constraints\DistanceConstraint2D.cs" />
+    <Compile Include="Physics\2D\Contact2D.cs" />
+    <Compile Include="Physics\3D\Bodies\SphereBody.cs" />
+    <Compile Include="Physics\3D\Bodies\PlaneBody.cs" />
+    <Compile Include="Physics\3D\Bodies\RigidBody3D.cs" />
+    <Compile Include="Physics\3D\Constraints\Constraint3D.cs" />
+    <Compile Include="Physics\3D\Constraints\DistanceConstraint3D.cs" />
+    <Compile Include="Physics\3D\Contact3D.cs" />
+    <Compile Include="Physics\3D\Geometry\AABB3D.cs" />
+    <Compile Include="Physics\3D\Geometry\Sphere.cs" />
+    <Compile Include="Physics\3D\Partitions\GridPartition3D.cs" />
+    <Compile Include="Physics\3D\Partitions\Partition3D.cs" />
+    <Compile Include="Physics\3D\PhysicsEngine3D.cs" />
+    <Compile Include="Physics\3D\Solver3D.cs" />
+    <Compile Include="Physics\GameMath.cs" />
+    <Compile Include="Physics\2D\Geometry\AABB2D.cs" />
+    <Compile Include="Physics\2D\Geometry\Circle.cs" />
+    <Compile Include="Physics\2D\Partitions\GridPartition2D.cs" />
+    <Compile Include="Physics\2D\Partitions\Partition2D.cs" />
+    <Compile Include="Physics\2D\PhysicsEngine2D.cs" />
+    <Compile Include="Physics\2D\Solver2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
