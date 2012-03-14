@@ -113,7 +113,7 @@ namespace GraphicsToolkit.Graphics
 
             //Test drawing
             device.SetRenderTargets(null);
-            RenderTexturedQuad(lightTarget);
+            RenderTexturedQuad(colorTarget);
         }
 
         private void RenderGBuffer(List<Mesh> meshes, Camera cam)
