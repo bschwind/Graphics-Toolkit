@@ -15,7 +15,7 @@ namespace GraphicsToolkit.Graphics
     /// </summary>
     public class Camera2D : Camera
     {
-        private Vector3 pos, vel; //These are stored internally as 3D vectors so we can use the Z component for zoom
+        private Vector3 vel; //These are stored internally as 3D vectors so we can use the Z component for zoom
         private float maxVel, dampingFactor, accFactor, zoomFactor, zoomVel, zoomAmount;
         private float normalizedWidth, normalizedHeight;
 

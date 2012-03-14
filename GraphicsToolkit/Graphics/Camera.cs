@@ -13,6 +13,7 @@ namespace GraphicsToolkit.Graphics
         protected Matrix view, projection;
         protected float nearPlane = 0.1f;
         protected float farPlane = 1000f;
+        protected Vector3 pos;
 
         public Camera()
         {
@@ -32,6 +33,18 @@ namespace GraphicsToolkit.Graphics
             get
             {
                 return projection;
+            }
+        }
+
+        public Vector3 Pos
+        {
+            get
+            {
+                return pos;
+            }
+            set
+            {
+                pos = value;
             }
         }
 

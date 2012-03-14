@@ -97,6 +97,7 @@
     <Compile Include="Graphics\Camera2D.cs" />
     <Compile Include="Graphics\DeferredRenderer.cs" />
     <Compile Include="Graphics\FirstPersonCamera.cs" />
+    <Compile Include="Graphics\Lights\DirectionalLight.cs" />
     <Compile Include="Graphics\Mesh.cs" />
     <Compile Include="Graphics\MeshBuilder.cs" />
     <Compile Include="Graphics\PrimitiveBatch.cs" />

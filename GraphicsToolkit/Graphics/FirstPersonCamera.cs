@@ -19,22 +19,10 @@ namespace GraphicsToolkit.Graphics
         private float turnSpeed;
         private float moveSpeed;
         private float fieldOfView = 45f;
-        private Vector3 pos, dir, up, left;
+        private Vector3 dir, up, left;
         protected static Vector3 startUp = Vector3.Up;
         protected static Vector3 startDir = new Vector3(0, 0, -1);
         private Vector2 mouseDelta;
-
-        public Vector3 Pos
-        {
-            get
-            {
-                return pos;
-            }
-            set
-            {
-                pos = value;
-            }
-        }
 
         public Vector2 MouseDelta
         {
