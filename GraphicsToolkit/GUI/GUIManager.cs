@@ -84,14 +84,6 @@ namespace GraphicsToolkit.GUI
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-            //Render the panels to textures
-            /*foreach (Panel p in panels)
-            {
-                p.BeginDraw();
-                p.Draw(gameTime);
-                p.EndDraw();
-            }*/
-
             //Clear the screen
             Game.GraphicsDevice.Clear(BackgroundColor);
 
@@ -100,14 +92,6 @@ namespace GraphicsToolkit.GUI
                 Game.GraphicsDevice.Viewport = p.ViewPort;
                 p.Draw(gameTime);
             }
-
-            //Draw our panel textures
-            /*spriteBatch.Begin();
-            foreach (Panel p in panels)
-            {
-                spriteBatch.Draw(p.PanelTexture, p.ScreenRect, Color.White);
-            }
-            spriteBatch.End();*/
         }
     }
 }

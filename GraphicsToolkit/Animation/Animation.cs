@@ -57,9 +57,10 @@ namespace GraphicsToolkit.Animation
                 for (int j = 0; j < numMarkers; j++)
                 {
                     Vector3 pos = new Vector3();
-                    pos.X = float.Parse(splitString[2 + (3 * j)]);
-                    pos.Y = float.Parse(splitString[3 + (3 * j)]);
-                    pos.Z = float.Parse(splitString[4 + (3 * j)]);
+                    //Account for the different coordinate system...examine this later
+                    pos.X = -float.Parse(splitString[2 + (3 * j)]);
+                    pos.Z = float.Parse(splitString[3 + (3 * j)]);
+                    pos.Y = float.Parse(splitString[4 + (3 * j)]);
 
                     positions[j] = pos;
                 }
