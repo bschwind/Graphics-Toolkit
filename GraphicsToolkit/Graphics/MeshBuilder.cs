@@ -74,6 +74,26 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void RotateAllVerts(Quaternion rot)
+        {
+            if (!hasBegun)
+            {
+                throw new Exception("Can't rotate verts without beginning a new mesh");
+            }
+
+            for (int i = 0; i < softVerts.Count; i++)
+            {
+                VertexPositionNormalTexture vert = softVerts[i];
+                softVerts[i] = new VertexPositionNormalTexture(Vector3.Transform(vert.Position, rot), Vector3.TransformNormal(vert.Normal, Matrix.CreateFromQuaternion(rot)), vert.TextureCoordinate);
+            }
+
+            for (int i = 0; i < hardVerts.Count; i++)
+            {
+                VertexPositionNormalTexture vert = hardVerts[i];
+                hardVerts[i] = new VertexPositionNormalTexture(Vector3.Transform(vert.Position, rot), Vector3.TransformNormal(vert.Normal, Matrix.CreateFromQuaternion(rot)), vert.TextureCoordinate);
+            }
+        }
+
         public void AddTriangle(Vector3 a, Vector3 b, Vector3 c, bool softEdge)
         {
             if (softEdge)
