@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using GraphicsToolkit.Graphics.Lights;
 
 namespace GraphicsToolkit.Graphics
 {
@@ -12,7 +13,7 @@ namespace GraphicsToolkit.Graphics
     {
         private Effect DeferredEffect;
 
-        private Effect DirectionalLightEffect;
+        private Effect LightsEffect;
 
         private GraphicsDevice device;
         private RenderTarget2D colorTarget;
@@ -25,6 +26,8 @@ namespace GraphicsToolkit.Graphics
         private VertexPositionTexture[] quad;
         private short[] quadIndices;
 
+        private List<GlobalLight> globalLights;
+
         public DeferredRenderer(GraphicsDevice device, ContentManager content)
         {
             this.device = device;
@@ -34,9 +37,13 @@ namespace GraphicsToolkit.Graphics
             SetUpLightMap();
 
             DeferredEffect = content.Load<Effect>("Effects/Deferred");
-            DirectionalLightEffect = content.Load<Effect>("Effects/DeferredDirectionalLight");
+            LightsEffect = content.Load<Effect>("Effects/DeferredLights");
 
             SetUpEffectParameters();
+
+            globalLights = new List<GlobalLight>();
+            globalLights.Add(new GlobalLight(new Vector3(0, -1, 2), Color.Red, 1.0f));
+            globalLights.Add(new GlobalLight(new Vector3(1, -2, 0.2f), Color.Blue, 0.5f));
         }
 
         private void SetUpEffectParameters()
@@ -47,8 +54,8 @@ namespace GraphicsToolkit.Graphics
             DeferredEffect.Parameters["HalfPixelWidth"].SetValue(halfPixWidth);
             DeferredEffect.Parameters["HalfPixelHeight"].SetValue(halfPixHeight);
 
-            DirectionalLightEffect.Parameters["HalfPixelWidth"].SetValue(halfPixWidth);
-            DirectionalLightEffect.Parameters["HalfPixelHeight"].SetValue(halfPixHeight);
+            LightsEffect.Parameters["HalfPixelWidth"].SetValue(halfPixWidth);
+            LightsEffect.Parameters["HalfPixelHeight"].SetValue(halfPixHeight);
         }
 
         private void SetUpLightMap()
@@ -105,15 +112,16 @@ namespace GraphicsToolkit.Graphics
             ClearGBuffer();
             RenderGBuffer(meshes, cam);
             RenderLights(cam);
-
-            
+  
             device.BlendState = BlendState.Opaque;
             device.RasterizerState = RasterizerState.CullCounterClockwise;
             device.DepthStencilState = DepthStencilState.Default;
 
+
+            Composite(null);
             //Test drawing
-            device.SetRenderTargets(null);
-            RenderTexturedQuad(colorTarget);
+            //device.SetRenderTargets(null);
+            //RenderTexturedQuad(lightTarget);
         }
 
         private void RenderGBuffer(List<Mesh> meshes, Camera cam)
@@ -151,10 +159,10 @@ namespace GraphicsToolkit.Graphics
         private void RenderLights(Camera cam)
         {
             device.SetRenderTarget(lightTarget);
-            device.Clear(Color.Black);
+            //Clear the light target to black
+            device.Clear(Color.Transparent);
             device.BlendState = LightMapBS;
             device.DepthStencilState = DepthStencilState.DepthRead;
-
             //Color Sampler
             device.Textures[0] = colorTarget;
             device.SamplerStates[0] = SamplerState.PointClamp;
@@ -168,15 +176,40 @@ namespace GraphicsToolkit.Graphics
             Matrix inverseView = Matrix.Invert(cam.View);
             Matrix inverseViewProj = Matrix.Invert(cam.View * cam.Projection);
 
-            DirectionalLightEffect.Parameters["InverseViewProj"].SetValue(inverseViewProj);
-            DirectionalLightEffect.Parameters["InverseView"].SetValue(inverseView);
-            DirectionalLightEffect.Parameters["CamPos"].SetValue(cam.Pos);
+            LightsEffect.Parameters["InverseViewProj"].SetValue(inverseViewProj);
+            LightsEffect.Parameters["InverseView"].SetValue(inverseView);
+            LightsEffect.Parameters["CamPos"].SetValue(cam.Pos);
+            LightsEffect.Parameters["GBufferSize"].SetValue(new Vector2(Config.ScreenWidth, Config.ScreenHeight));
 
-            DirectionalLightEffect.Parameters["LightDir"].SetValue(new Vector3(0, -1, 0));
-            DirectionalLightEffect.Parameters["LightColor"].SetValue(Color.White.ToVector4());
-            DirectionalLightEffect.Parameters["LightIntensity"].SetValue(1);
+            LightsEffect.CurrentTechnique = LightsEffect.Techniques["DirectionalLight"];
+            LightsEffect.CurrentTechnique.Passes[0].Apply();
 
-            DirectionalLightEffect.CurrentTechnique.Passes[0].Apply();
+            foreach (GlobalLight g in globalLights)
+            {
+                RenderGlobalLight(g);
+            }
+        }
+
+        private void RenderGlobalLight(GlobalLight light)
+        {
+            LightsEffect.Parameters["LightDir"].SetValue(light.Direction);
+            LightsEffect.Parameters["LightColor"].SetValue(light.Color.ToVector4());
+            LightsEffect.Parameters["LightIntensity"].SetValue(light.Intensity);
+
+            RenderQuad();
+        }
+
+        private void Composite(RenderTarget2D output)
+        {
+            device.SetRenderTarget(output);
+            device.Clear(Color.Transparent);
+            device.Textures[0] = colorTarget;
+            device.SamplerStates[0] = SamplerState.PointClamp;
+            device.Textures[1] = lightTarget;
+            device.SamplerStates[1] = SamplerState.PointClamp;
+
+            DeferredEffect.CurrentTechnique = DeferredEffect.Techniques["Composite"];
+            DeferredEffect.CurrentTechnique.Passes[0].Apply();
             RenderQuad();
         }
 
