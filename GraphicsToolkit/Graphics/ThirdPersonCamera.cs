@@ -21,7 +21,7 @@ namespace GraphicsToolkit.Graphics
         protected static Vector3 startDir;
         protected static Vector3 startUp = Vector3.Up;
         private float chaseDistance;
-        private const float chaseSpeed = 20f;
+        private const float chaseSpeed = 3f;
 
         private Vector2 mouseDelta;
 
@@ -125,7 +125,6 @@ namespace GraphicsToolkit.Graphics
             Vector3.TransformNormal(ref startUp, ref rotation, out up);
             Vector3.Cross(ref up, ref dir, out left);
 
-            //Cam pos = targetPos + -forward * chaseDistance
             //pos = dir + -1 * forward * chaseDistance;
             Vector3 desiredPos = lookAtTarget - (dir * chaseDistance);
             Vector3 vel = desiredPos - pos;
