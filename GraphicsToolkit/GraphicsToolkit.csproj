@@ -92,6 +92,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\Animation.cs" />
+    <Compile Include="Animation\AnimationFrame.cs" />
+    <Compile Include="Animation\MotionCaptureParser.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Graphics\Camera2D.cs" />
