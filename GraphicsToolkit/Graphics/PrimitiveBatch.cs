@@ -530,7 +530,12 @@ namespace GraphicsToolkit.Graphics
             effect.Projection = cam.Projection;
             effect.World = world;
             effect.VertexColorEnabled = false;
-            //effect.TextureEnabled = true;
+            effect.TextureEnabled = false;
+            if (mesh.Texture != null)
+            {
+                effect.Texture = mesh.Texture;
+                effect.TextureEnabled = true;
+            }
             effect.PreferPerPixelLighting = true;
             effect.EnableDefaultLighting();
 
@@ -550,7 +555,7 @@ namespace GraphicsToolkit.Graphics
             effect.VertexColorEnabled = true;
             effect.LightingEnabled = false;
             effect.World = previousWorld;
-            //effect.TextureEnabled = false;
+            effect.TextureEnabled = false;
             //effect.PreferPerPixelLighting = false;
         }
 
