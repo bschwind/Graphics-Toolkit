@@ -58,9 +58,9 @@ namespace GraphicsToolkit.Animation
                 {
                     Vector3 pos = new Vector3();
                     //Account for the different coordinate system...examine this later
-                    pos.X = -float.Parse(splitString[2 + (3 * j)]);
-                    pos.Z = float.Parse(splitString[3 + (3 * j)]);
-                    pos.Y = float.Parse(splitString[4 + (3 * j)]);
+                    pos.X = float.Parse(splitString[2 + (3 * j)]);
+                    pos.Y = float.Parse(splitString[3 + (3 * j)]);
+                    pos.Z = float.Parse(splitString[4 + (3 * j)]);
 
                     positions[j] = pos;
                 }
