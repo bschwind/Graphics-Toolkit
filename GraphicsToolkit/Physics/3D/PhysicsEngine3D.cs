@@ -19,7 +19,7 @@ namespace GraphicsToolkit.Physics._3D
         private List<Contact3D> contacts = new List<Contact3D>();
         private Partition3D partition;
 
-        public PhysicsEngine3D() : this(new GridPartition3D(Vector3.Zero, new Vector3(20, 10, 10), 40, 40))
+        public PhysicsEngine3D() : this(new GridPartition3D(Vector3.Zero, new Vector3(20, 10, 10), 2, 2, 2))
         {
 
         }
