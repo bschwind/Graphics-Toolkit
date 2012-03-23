@@ -152,6 +152,64 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public void AddTriangle(Vector3 a, Vector3 b, Vector3 c, Vector2 tex1, Vector2 tex2, Vector2 tex3, bool softEdge)
+        {
+            if (softEdge)
+            {
+                int aIndex = -1, bIndex = -1, cIndex = -1;
+
+                for (int i = 0; i < softVerts.Count; i++)
+                {
+                    if (VerticesAreClose(a, softVerts[i].Position))
+                    {
+                        aIndex = i;
+                    }
+                    if (VerticesAreClose(b, softVerts[i].Position))
+                    {
+                        bIndex = i;
+                    }
+                    if (VerticesAreClose(c, softVerts[i].Position))
+                    {
+                        cIndex = i;
+                    }
+                }
+
+                if (aIndex == -1)
+                {
+                    softVerts.Add(new VertexPositionNormalTexture(a, Vector3.Zero, tex1));
+                    aIndex = softVerts.Count - 1;
+                }
+
+                if (bIndex == -1)
+                {
+                    softVerts.Add(new VertexPositionNormalTexture(b, Vector3.Zero, tex2));
+                    bIndex = softVerts.Count - 1;
+                }
+
+                if (cIndex == -1)
+                {
+                    softVerts.Add(new VertexPositionNormalTexture(c, Vector3.Zero, tex3));
+                    cIndex = softVerts.Count - 1;
+                }
+
+                softTriangles.Add(new TriangleData(aIndex, bIndex, cIndex));
+            }
+            else
+            {
+                int aIndex, bIndex, cIndex;
+
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(c - a, b - a));
+                hardVerts.Add(new VertexPositionNormalTexture(a, normal, Vector2.Zero));
+                aIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(b, normal, Vector2.Zero));
+                bIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(c, normal, Vector2.Zero));
+                cIndex = hardVerts.Count - 1;
+
+                hardTriangles.Add(new TriangleData(aIndex, bIndex, cIndex));
+            }
+        }
+
         public void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, bool softEdge)
         {
             if (softEdge)
@@ -197,6 +255,32 @@ namespace GraphicsToolkit.Graphics
                 hardVerts.Add(new VertexPositionNormalTexture(v3, normal, endTex));
                 cIndex = hardVerts.Count - 1;
                 hardVerts.Add(new VertexPositionNormalTexture(v4, normal, new Vector2(startTex.X, startTex.Y + (endTex.Y-startTex.Y))));
+                dIndex = hardVerts.Count - 1;
+
+                hardTriangles.Add(new TriangleData(aIndex, bIndex, dIndex));
+                hardTriangles.Add(new TriangleData(bIndex, cIndex, dIndex));
+            }
+        }
+
+        public void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, bool softEdge, Vector2 tex1, Vector2 tex2, Vector2 tex3, Vector2 tex4)
+        {
+            if (softEdge)
+            {
+                AddTriangle(v1, v2, v4, tex1, tex2, tex4, softEdge);
+                AddTriangle(v2, v3, v4, tex2, tex3, tex4, softEdge);
+            }
+            else //This case is hard coded to save us from using two extra vertices when using quads
+            {
+                int aIndex, bIndex, cIndex, dIndex;
+
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(v3 - v1, v2 - v1));
+                hardVerts.Add(new VertexPositionNormalTexture(v1, normal, tex1));
+                aIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v2, normal, tex2));
+                bIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v3, normal, tex3));
+                cIndex = hardVerts.Count - 1;
+                hardVerts.Add(new VertexPositionNormalTexture(v4, normal, tex4));
                 dIndex = hardVerts.Count - 1;
 
                 hardTriangles.Add(new TriangleData(aIndex, bIndex, dIndex));
