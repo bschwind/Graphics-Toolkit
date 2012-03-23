@@ -19,18 +19,17 @@ namespace GraphicsToolkit.Physics._2D
         private List<Contact2D> contacts = new List<Contact2D>();
         private Partition2D partition;
 
-        public PhysicsEngine2D()
+        public PhysicsEngine2D() : this(new GridPartition2D(Vector2.Zero, new Vector2(20, 10), 40, 40))
+        {
+
+        }
+
+        public PhysicsEngine2D(Partition2D p)
         {
             bodies = new List<RigidBody2D>();
             lines = new List<RigidBody2D>();
             constraints = new List<Constraint2D>();
 
-            //By default, use a grid partition
-            partition = new GridPartition2D(Vector2.Zero, new Vector2(20, 10), 40, 40);
-        }
-
-        public PhysicsEngine2D(Partition2D p)
-        {
             partition = p;
         }
 
