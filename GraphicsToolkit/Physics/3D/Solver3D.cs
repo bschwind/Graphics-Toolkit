@@ -32,11 +32,11 @@ namespace GraphicsToolkit.Physics._3D
                             float mag = remove / (con.A.InvMass + con.B.InvMass);
                             Vector3 imp = con.Normal * mag;
                             con.ApplyImpulses(imp);
-                            Vector3 aVel = con.A.GetVelocityOfPoint(con.pointA);
-                            Vector3 bVel = con.B.GetVelocityOfPoint(con.pointB);
-                            Vector3 relVel = bVel - aVel;
-                            con.B.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
-                            con.A.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
+                            //Vector3 aVel = con.A.GetVelocityOfPoint(con.pointA);
+                            //Vector3 bVel = con.B.GetVelocityOfPoint(con.pointB);
+                            //Vector3 relVel = bVel - aVel;
+                            //con.B.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
+                            //con.A.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
                             //con.ApplyImpulses(relVel / (con.A.InvMass + con.B.InvMass));
                         }
                     }
