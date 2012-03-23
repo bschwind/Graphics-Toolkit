@@ -10,21 +10,22 @@ namespace GraphicsToolkit.Physics._3D.Partitions
 {
     public class GridPartition3D : Partition3D
     {
-        private Cell[] cells;
-        private int rows, cols;
-        private float invWidth, invHeight;
+        private Cell3D[] cells;
+        private int rows, cols, stacks;
+        private float invWidth, invHeight, invDepth;
         private Vector3 min, max;
 
-        public GridPartition3D(Vector3 min, Vector3 max, int rows, int cols)
+        public GridPartition3D(Vector3 min, Vector3 max, int rows, int cols, int stacks)
         {
-            cells = new Cell[rows * cols];
+            cells = new Cell3D[rows * cols * stacks];
             for (int i = 0; i < cells.Length; i++)
             {
-                cells[i] = new Cell();
+                cells[i] = new Cell3D();
             }
 
             this.rows = rows;
             this.cols = cols;
+            this.stacks = stacks;
 
             UpdateMinMax(min, max);
         }
@@ -36,8 +37,10 @@ namespace GraphicsToolkit.Physics._3D.Partitions
 
             float width = (max.X - min.X);
             float height = (max.Y - min.Y);
+            float depth = (max.Z - min.Z);
             invWidth = 1f / width;
             invHeight = 1f / height;
+            invDepth = 1f / depth;
         }
 
         public override void GenerateContacts(ref List<RigidBody3D> bodies, ref List<Contact3D> contacts, float dt)
@@ -61,17 +64,26 @@ namespace GraphicsToolkit.Physics._3D.Partitions
                 int startCol = (int)(min.Y * invHeight * cols);
                 startCol = (int)Math.Max(startCol, 0);
 
+                int startStack = (int)(min.Z * invDepth * stacks);
+                startStack = (int)Math.Max(startStack, 0);
+
                 int endRow = (int)(max.X * invWidth * rows);
                 endRow = (int)Math.Min(endRow, rows-1);
 
                 int endCol = (int)(max.Y * invHeight * cols);
                 endCol = (int)Math.Min(endCol, cols-1);
 
+                int endStack = (int)(max.Z * invDepth * stacks);
+                endStack = (int)Math.Min(endStack, stacks - 1);
+
                 for (int j = startRow; j <= endRow; j++)
                 {
                     for (int k = startCol; k <= endCol; k++)
                     {
-                        cells[(j * cols) + k].AddObject(i);
+                        for (int l = startStack; l <= endStack; l++)
+                        {
+                            cells[(j * cols) + (k*rows) + l].AddObject(i);
+                        }  
                     }
                 }
             }
@@ -84,7 +96,7 @@ namespace GraphicsToolkit.Physics._3D.Partitions
                     continue;
                 }
 
-                Cell currentCell = cells[i];
+                Cell3D currentCell = cells[i];
                 foreach (int index1 in currentCell.Indices)
                 {
                     foreach (int index2 in currentCell.Indices)
@@ -106,11 +118,11 @@ namespace GraphicsToolkit.Physics._3D.Partitions
             }
         }
 
-        internal class Cell
+        internal class Cell3D
         {
             private LinkedList<int> indices;
 
-            public Cell()
+            public Cell3D()
             {
                 indices = new LinkedList<int>();
             }
