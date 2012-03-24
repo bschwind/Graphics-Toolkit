@@ -1,4 +1,7 @@
-﻿using System;
+﻿//Special thanks to Paul Firth:
+//http://www.wildbunny.co.uk/blog/2011/03/25/speculative-contacts-an-continuous-collision-engine-approach-part-1/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -1,4 +1,7 @@
-﻿using System;
+﻿//Special thanks to Paul Firth:
+//http://www.wildbunny.co.uk/blog/2011/04/06/physics-engines-for-dummies/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
