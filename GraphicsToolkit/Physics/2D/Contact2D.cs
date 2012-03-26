@@ -26,7 +26,7 @@ namespace GraphicsToolkit.Physics._2D
             this.pointA = pointA;
             this.pointB = pointB;
 
-            Normal = new Vector2((float)(Normal.X + rand.NextDouble() / 100f), (float)(Normal.Y + rand.NextDouble() / 100f));
+            Normal = new Vector2((float)(Normal.X + (rand.NextDouble() - 0.5) / 100f), (float)(Normal.Y + (rand.NextDouble() - 0.5) / 100f));
 
             //I = (1+e)*N*(Vr • N) / (1/Ma + 1/Mb)
             //Impulse = (Vector2.Dot(b.Vel - a.Vel, normal) / (a.InvMass + b.InvMass));
