@@ -21,7 +21,7 @@ namespace GraphicsToolkit.Graphics
         protected static Vector3 startDir;
         protected static Vector3 startUp = Vector3.Up;
         private float chaseDistance;
-        private const float chaseSpeed = 3f;
+        private const float chaseSpeed = 20f;
 
         private Vector2 mouseDelta;
 
