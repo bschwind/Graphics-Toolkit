@@ -30,6 +30,10 @@ namespace GraphicsToolkit.Physics._3D.Bodies
             {
                 return pos;
             }
+            set
+            {
+                pos = value;
+            }
         }
 
         public float Rot

@@ -15,6 +15,8 @@ namespace GraphicsToolkit.Physics._3D
         public float Impulse;
         public RigidBody3D A, B;
 
+        public static Random rand = new Random();
+
         public Contact3D(Vector3 normal, float d, RigidBody3D a, RigidBody3D b, Vector3 pointA, Vector3 pointB)
         {
             Normal = normal;
@@ -23,6 +25,8 @@ namespace GraphicsToolkit.Physics._3D
             B = b;
             this.pointA = pointA;
             this.pointB = pointB;
+
+            Normal = new Vector3((float)(Normal.X + (rand.NextDouble() - 0.5) / 100f), (float)(Normal.Y + (rand.NextDouble() - 0.5) / 100f), (float)(Normal.Z + (rand.NextDouble() - 0.5) / 100f));
 
             //I = (1+e)*N*(Vr • N) / (1/Ma + 1/Mb)
             //Impulse = (Vector3.Dot(b.Vel - a.Vel, normal) / (a.InvMass + b.InvMass));

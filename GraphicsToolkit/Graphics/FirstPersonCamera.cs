@@ -32,6 +32,14 @@ namespace GraphicsToolkit.Graphics
             }
         }
 
+        public Vector3 Dir
+        {
+            get
+            {
+                return dir;
+            }
+        }
+
         /// <summary>
         /// Creates a new first person camera, centered at the origin, looking down the negative Z axis.
         /// </summary>
