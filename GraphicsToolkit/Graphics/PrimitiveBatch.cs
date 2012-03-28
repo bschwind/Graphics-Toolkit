@@ -199,6 +199,26 @@ namespace GraphicsToolkit.Graphics
             DrawLine(pos - extents, pos + new Vector2(-extents.X, extents.Y), color);
         }
 
+        public void DrawAABB(Vector3 pos, Vector3 extents, Color color)
+        {
+            //Draw the top face
+            DrawLine(pos + new Vector3(extents.X, extents.Y, -extents.Z), pos + new Vector3(extents.X, extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(extents.X, extents.Y, extents.Z), pos + new Vector3(-extents.X, extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, extents.Y, extents.Z), pos + new Vector3(-extents.X, extents.Y, -extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, extents.Y, -extents.Z), pos + new Vector3(extents.X, extents.Y, -extents.Z), color);
+
+            //Draw the bottom face
+            DrawLine(pos + new Vector3(extents.X, -extents.Y, -extents.Z), pos + new Vector3(extents.X, -extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(extents.X, -extents.Y, extents.Z), pos + new Vector3(-extents.X, -extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, -extents.Y, extents.Z), pos + new Vector3(-extents.X, -extents.Y, -extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, -extents.Y, -extents.Z), pos + new Vector3(extents.X, -extents.Y, -extents.Z), color);
+
+            DrawLine(pos + new Vector3(extents.X, extents.Y, -extents.Z), pos + new Vector3(extents.X, -extents.Y, -extents.Z), color);
+            DrawLine(pos + new Vector3(extents.X, extents.Y, extents.Z), pos + new Vector3(extents.X, -extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, extents.Y, extents.Z), pos + new Vector3(-extents.X, -extents.Y, extents.Z), color);
+            DrawLine(pos + new Vector3(-extents.X, extents.Y, -extents.Z), pos + new Vector3(-extents.X, -extents.Y, -extents.Z), color);
+        }
+
         public void DrawPie(Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color)
         {
             AddVertex(new VertexPositionColor(new Vector3(center, 0), color));
