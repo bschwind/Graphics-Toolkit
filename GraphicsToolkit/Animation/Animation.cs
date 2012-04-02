@@ -69,6 +69,8 @@ namespace GraphicsToolkit.Animation
                 frames[i] = frame;
             }
 
+            sr.Close();
+
             return new Animation(frames, numMarkers);
         }
 
