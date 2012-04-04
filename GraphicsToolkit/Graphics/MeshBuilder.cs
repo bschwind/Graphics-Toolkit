@@ -199,11 +199,11 @@ namespace GraphicsToolkit.Graphics
                 int aIndex, bIndex, cIndex;
 
                 Vector3 normal = Vector3.Normalize(Vector3.Cross(c - a, b - a));
-                hardVerts.Add(new VertexPositionNormalTexture(a, normal, Vector2.Zero));
+                hardVerts.Add(new VertexPositionNormalTexture(a, normal, tex1));
                 aIndex = hardVerts.Count - 1;
-                hardVerts.Add(new VertexPositionNormalTexture(b, normal, Vector2.Zero));
+                hardVerts.Add(new VertexPositionNormalTexture(b, normal, tex2));
                 bIndex = hardVerts.Count - 1;
-                hardVerts.Add(new VertexPositionNormalTexture(c, normal, Vector2.Zero));
+                hardVerts.Add(new VertexPositionNormalTexture(c, normal, tex3));
                 cIndex = hardVerts.Count - 1;
 
                 hardTriangles.Add(new TriangleData(aIndex, bIndex, cIndex));
@@ -240,8 +240,10 @@ namespace GraphicsToolkit.Graphics
         {
             if (softEdge)
             {
-                AddTriangle(v1, v2, v4, softEdge);
-                AddTriangle(v2, v3, v4, softEdge);
+                //AddTriangle(v1, v2, v4, softEdge);
+                AddTriangle(v1, v2, v4, startTex, new Vector2(startTex.X + (endTex.X - startTex.X), startTex.Y), new Vector2(startTex.X, startTex.Y + (endTex.Y - startTex.Y)), softEdge);
+                //AddTriangle(v2, v3, v4, softEdge);
+                AddTriangle(v2, v3, v4, new Vector2(startTex.X + (endTex.X - startTex.X), startTex.Y), endTex, new Vector2(startTex.X, startTex.Y + (endTex.Y - startTex.Y)), softEdge);
             }
             else //This case is hard coded to save us from using two extra vertices when using quads
             {
