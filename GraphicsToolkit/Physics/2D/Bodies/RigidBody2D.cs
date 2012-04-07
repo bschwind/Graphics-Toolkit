@@ -91,6 +91,10 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             {
                 return force;
             }
+            set
+            {
+                force = value;
+            }
         }
 
         public float Torque
@@ -98,6 +102,10 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             get
             {
                 return torque;
+            }
+            set
+            {
+                torque = value;
             }
         }
 
@@ -147,10 +155,11 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             force += f;
         }
 
+        //Applies a force at point p in the local coordinates of the body
         public void AddForce(Vector2 f, Vector2 p)
         {
             force += f;
-            Vector2 fPerp = new Vector2(f.Y, -f.X);
+            Vector2 fPerp = GameMath.Perp2D(f);
             torque += Vector2.Dot(fPerp, p);
         }
 
@@ -169,9 +178,16 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             rot += rotVel * dt;
         }
 
-        public Vector2 GetVelocityOfPoint(Vector2 p)
+        //Gets the velocity of a point (defined in world coordinates) on the body
+        public Vector2 GetVelocityOfWorldPoint(Vector2 p)
         {
-            return this.vel + (rotVel * GameMath.Perp2D(p - this.pos));
+            return this.vel + (-rotVel * GameMath.Perp2D(p - this.pos));
+        }
+
+        //Gets the velocity of a point (defined in local coordinates) on the body
+        public Vector2 GetVelocityOfLocalPoint(Vector2 p)
+        {
+            return this.vel + (-rotVel * GameMath.Perp2D(p));
         }
     }
 }

@@ -19,8 +19,8 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             }
         }
 
-        public CircleBody(Vector2 pos, Vector2 vel, float mass, float radius)
-            : base(pos, vel, 0f, mass, 1f)
+        public CircleBody(Vector2 pos, Vector2 vel, float rotVel, float mass, float radius)
+            : base(pos, vel, rotVel, mass, (mass*radius*radius)/2f)
         {
             this.radius = radius;
         }

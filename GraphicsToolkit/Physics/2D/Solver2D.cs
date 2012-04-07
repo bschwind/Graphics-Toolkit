@@ -14,6 +14,8 @@ namespace GraphicsToolkit.Physics._2D
     {
         public static void Solve(List<Contact2D> contacts, int iterations, float dt)
         {
+            float muD = 0.9f;
+
             bool SpecSequential = false;
             float dtInv = 1f / dt;
             for (int j = 0; j < iterations; j++)
@@ -28,19 +30,27 @@ namespace GraphicsToolkit.Physics._2D
                     //Do either speculative or speculative sequential
                     if (!SpecSequential)
                     {
-                        float remove = relNv + con.Dist * dtInv;
-
+                        float remove = relNv + con.Dist / (1f/60);
+                        //double remove = relNv + con.m_dist / Constants.kTimeStep(1/30);
                         if (remove < 0)
                         {
-                            float mag = remove / (con.A.InvMass + con.B.InvMass);
+                            Vector2 aVel = con.A.GetVelocityOfWorldPoint(con.pointA);
+                            Vector2 bVel = con.B.GetVelocityOfWorldPoint(con.pointB);
+                            Vector2 relVel = bVel - aVel;
+
+                            float mag = remove * con.InvDenom;
+                            
                             Vector2 imp = con.Normal * mag;
-                            con.ApplyImpulses(imp);
-                            //Vector2 aVel = con.A.GetVelocityOfPoint(con.pointA);
-                            //Vector2 bVel = con.B.GetVelocityOfPoint(con.pointB);
-                            //Vector2 relVel = bVel - aVel;
-                            //con.B.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
-                            //con.A.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
-                            //con.ApplyImpulses(relVel / (con.A.InvMass + con.B.InvMass));
+
+                            Vector2 t = relVel-(Vector2.Dot(relVel,n))*n;
+                            if (!(t.Length() <= float.Epsilon))
+                            {
+                                t = Vector2.Normalize(t);
+                            }
+
+                            Vector2 frictionJ = -(muD * Math.Abs(mag)) *t; ;
+
+                            con.ApplyImpulses(imp-frictionJ);
                         }
                     }
                     else
