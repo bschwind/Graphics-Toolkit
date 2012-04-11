@@ -8,12 +8,20 @@ using System.Threading;
 
 namespace GraphicsToolkit.Networking
 {
+    public delegate void ServerHandlePacketData(byte[] data, int dataLength, TcpClient client);
+
     public class Server
     {
         TcpListener listener;
+        public event ServerHandlePacketData OnDataReceived;
+        private Dictionary<TcpClient, NetworkBuffer> clientBuffers;
+        int sendBufferSize = 1024;
+        int readBufferSize = 1024;
 
         public Server(int port)
         {
+            clientBuffers = new Dictionary<TcpClient, NetworkBuffer>();
+
             listener = new TcpListener(IPAddress.Any, port);
             Console.WriteLine("Started server on port " + port);
 
@@ -30,8 +38,20 @@ namespace GraphicsToolkit.Networking
                 TcpClient client = listener.AcceptTcpClient();
                 Thread clientThread = new Thread(new ParameterizedThreadStart(WorkWithClient));
                 Console.WriteLine("New client connected");
+
+                NetworkBuffer newBuff = new NetworkBuffer();
+                newBuff.WriteBuffer = new byte[sendBufferSize];
+                newBuff.ReadBuffer = new byte[readBufferSize];
+                newBuff.CurrentWriteByteCount = 0;
+                clientBuffers.Add(client, newBuff);
+
                 clientThread.Start(client);
             }
+        }
+
+        public void Disconnect()
+        {
+            listener.Stop();
         }
 
         private void WorkWithClient(object client)
@@ -44,7 +64,6 @@ namespace GraphicsToolkit.Networking
 
             NetworkStream clientStream = tcpClient.GetStream();
 
-            byte[] message = new byte[4096];
             int bytesRead;
 
             while (true)
@@ -54,7 +73,7 @@ namespace GraphicsToolkit.Networking
                 try
                 {
                     //blocks until a client sends a message
-                    bytesRead = clientStream.Read(message, 0, 4096);
+                    bytesRead = clientStream.Read(clientBuffers[tcpClient].ReadBuffer, 0, readBufferSize);
                 }
                 catch
                 {
@@ -65,15 +84,42 @@ namespace GraphicsToolkit.Networking
                 if (bytesRead == 0)
                 {
                     //the client has disconnected from the server
+                    Console.WriteLine("Client has disconnected");
                     break;
                 }
 
-                //message has successfully been received
-                ASCIIEncoding encoder = new ASCIIEncoding();
-                Console.WriteLine(encoder.GetString(message, 0, bytesRead));
+                if (OnDataReceived != null)
+                {
+                    OnDataReceived(clientBuffers[tcpClient].ReadBuffer, bytesRead, tcpClient);
+                }
             }
 
             tcpClient.Close();
+        }
+
+        public void AddToPacket(byte[] data, TcpClient client)
+        {
+            if (clientBuffers[client].CurrentWriteByteCount + data.Length > clientBuffers[client].WriteBuffer.Length)
+            {
+                FlushData(client);
+            }
+
+            Array.ConstrainedCopy(data, 0, clientBuffers[client].WriteBuffer, clientBuffers[client].CurrentWriteByteCount, data.Length);
+
+            clientBuffers[client].CurrentWriteByteCount += data.Length;
+        }
+
+        private void FlushData(TcpClient client)
+        {
+            client.GetStream().Write(clientBuffers[client].WriteBuffer, 0, clientBuffers[client].CurrentWriteByteCount);
+            client.GetStream().Flush();
+            clientBuffers[client].CurrentWriteByteCount = 0;
+        }
+
+        public void SendData(byte[] data, TcpClient client)
+        {
+            AddToPacket(data, client);
+            FlushData(client);
         }
     }
 }

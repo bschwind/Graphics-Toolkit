@@ -7,38 +7,53 @@ using System.Net.Sockets;
 
 namespace GraphicsToolkit.Networking
 {
-    public delegate void HandlePacketData(byte[] data);
+    public delegate void ClientHandlePacketData(byte[] data);
 
     public class Client
     {
         private TcpClient clientSocket;
         private NetworkStream clientStream;
-        public event HandlePacketData OnDataReceived;
+        public event ClientHandlePacketData OnDataReceived;
+        private NetworkBuffer buffer;
 
         public Client(int port)
         {
+            buffer = new NetworkBuffer();
+            buffer.WriteBuffer = new byte[4096];
+            buffer.CurrentWriteByteCount = 0;
+
             clientSocket = new TcpClient("localhost", port);
             clientStream = clientSocket.GetStream();
             Console.WriteLine("Connected to server");
+        }
 
-            if (OnDataReceived != null)
+        public void AddToPacket(byte[] data)
+        {
+            if (buffer.CurrentWriteByteCount + data.Length > buffer.WriteBuffer.Length)
             {
-                OnDataReceived(null);
+                FlushData();
             }
+
+            Array.ConstrainedCopy(data, 0, buffer.WriteBuffer, buffer.CurrentWriteByteCount, data.Length);
+
+            buffer.CurrentWriteByteCount += data.Length;
+        }
+
+        private void FlushData()
+        {
+            clientStream.Write(buffer.WriteBuffer, 0, buffer.CurrentWriteByteCount);
+            clientStream.Flush();
+            buffer.CurrentWriteByteCount = 0;
         }
 
         public void SendData(byte[] data)
         {
-            clientStream.Write(data, 0, data.Length);
-            clientStream.Flush();
+            AddToPacket(data);
+            FlushData();
         }
 
         public bool IsConnected()
         {
-            if (OnDataReceived != null)
-            {
-                OnDataReceived(null);
-            }
             return clientSocket.Connected;
         }
 
