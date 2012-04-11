@@ -13,7 +13,7 @@ namespace GraphicsToolkit.Physics._2D.Partitions
             {
                 for (int j = i + 1; j < bodies.Count; j++)
                 {
-                    contacts.Add(bodies[i].GenerateContact(bodies[j], dt));
+                    bodies[i].AddContacts(bodies[j], dt, ref contacts);
                 }
             }
         }

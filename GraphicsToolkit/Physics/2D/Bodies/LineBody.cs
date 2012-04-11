@@ -57,7 +57,12 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             //Do nothing. These lines will never move!
         }
 
-        public override Contact2D GenerateContact(RigidBody2D rb, float dt)
+        public override void PostIntegrationUpdate(Vector2 dx, float dRot)
+        {
+            //Do nothing
+        }
+
+        public override void AddContacts(RigidBody2D rb, float dt, ref List<Contact2D> contacts)
         {
             if (rb as CircleBody != null)
             {
@@ -66,12 +71,15 @@ namespace GraphicsToolkit.Physics._2D.Bodies
 
                 Vector2 pointOnPlane = c.Pos - (normal * (dist+c.Radius));
                 Vector2 pointOnBall = c.Pos - (normal * c.Radius);
-
-                return new Contact2D(normal, dist, this, rb, pointOnPlane, pointOnBall);
+                contacts.Add(new Contact2D(normal, dist, this, rb, pointOnPlane, pointOnBall));
             }
             else if (rb as LineBody != null)
             {
-                return new Contact2D();
+
+            }
+            else if (rb as CompoundBody != null)
+            {
+
             }
             else
             {

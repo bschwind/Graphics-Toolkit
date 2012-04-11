@@ -14,8 +14,8 @@ namespace GraphicsToolkit.Physics._2D
         public Vector2 Normal;
         public Vector2 pointA, pointB;
         public float Dist;
-        public float Impulse;
         public float InvDenom;
+        public float ImpulseN, ImpulseT;
         public RigidBody2D A, B;
 
         public static Random rand = new Random();
@@ -48,7 +48,8 @@ namespace GraphicsToolkit.Physics._2D
 
             //I = (1+e)*N*(Vr • N) / (1/Ma + 1/Mb)
             //Impulse = (Vector2.Dot(b.Vel - a.Vel, normal) / (a.InvMass + b.InvMass));
-            Impulse = 0;
+            ImpulseN = 0;
+            ImpulseT = 0;
         }
 
         //Applies an impulse at local point p on the body

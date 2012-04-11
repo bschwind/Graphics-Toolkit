@@ -101,7 +101,7 @@ namespace GraphicsToolkit.Physics._2D
             {
                 for (int j = 0; j < lines.Count; j++)
                 {
-                    contacts.Add(bodies[i].GenerateContact(lines[j], dt));
+                    bodies[i].AddContacts(lines[j], dt, ref contacts);
                 }
             }
 

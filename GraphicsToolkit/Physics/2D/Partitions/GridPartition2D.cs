@@ -99,7 +99,7 @@ namespace GraphicsToolkit.Physics._2D.Partitions
                         if (a.InvMass != 0 || b.InvMass != 0)
                         {
                             //Add a speculative contact
-                            contacts.Add(a.GenerateContact(b, dt));
+                            a.AddContacts(b, dt, ref contacts);
                         }
                     }
                 }

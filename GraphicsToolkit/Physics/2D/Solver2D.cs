@@ -14,10 +14,11 @@ namespace GraphicsToolkit.Physics._2D
     {
         public static void Solve(List<Contact2D> contacts, int iterations, float dt)
         {
-            float muD = 0.9f;
+            float muD = 0.7f;
 
-            bool SpecSequential = false;
+            bool SpecSequential = true;
             float dtInv = 1f / dt;
+
             for (int j = 0; j < iterations; j++)
             {
                 for (int i = 0; i < contacts.Count; i++)
@@ -30,7 +31,7 @@ namespace GraphicsToolkit.Physics._2D
                     //Do either speculative or speculative sequential
                     if (!SpecSequential)
                     {
-                        float remove = relNv + con.Dist / (1f/60);
+                        float remove = relNv + con.Dist * dtInv;
                         //double remove = relNv + con.m_dist / Constants.kTimeStep(1/30);
                         if (remove < 0)
                         {
@@ -48,14 +49,40 @@ namespace GraphicsToolkit.Physics._2D
                                 t = Vector2.Normalize(t);
                             }
 
-                            Vector2 frictionJ = -(muD * Math.Abs(mag)) *t; ;
+                            Vector2 frictionJ = -(muD * Math.Abs(mag)) *t;
 
                             con.ApplyImpulses(imp-frictionJ);
                         }
                     }
                     else
                     {
-                        //Do sequential...later
+                        Vector2 aVel = con.A.GetVelocityOfWorldPoint(con.pointA);
+                        Vector2 bVel = con.B.GetVelocityOfWorldPoint(con.pointB);
+                        Vector2 relVel = bVel - aVel;
+
+                        float remove = relNv + con.Dist * dtInv;
+
+                        float mag = remove * con.InvDenom;
+                        float newImpulse = Math.Min(mag + con.ImpulseN, 0);
+                        float change = newImpulse - con.ImpulseN;
+
+                        Vector2 imp = con.Normal * change;
+
+                        // apply impulse
+                        con.ApplyImpulses(imp);
+                        con.ImpulseN = newImpulse;
+
+                        float absMag = Math.Abs(con.ImpulseN) * muD;
+
+                        // friction
+                        mag = Vector2.Dot(relVel, GameMath.Perp2D(n)) * con.InvDenom;
+                        newImpulse = MathHelper.Clamp(mag + con.ImpulseT, -absMag, absMag);
+                        change = newImpulse - con.ImpulseT;
+                        imp = GameMath.Perp2D(n) * change;
+
+                        // apply impulse
+                        con.ApplyImpulses(imp);
+                        con.ImpulseT = newImpulse;
                     }
                 }
             }
