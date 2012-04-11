@@ -8,13 +8,11 @@ namespace GraphicsToolkit.Animation
 {
     public struct MatrixAnimationFrame
     {
-        public float roll, pitch, yaw;
+        public Matrix[] Transforms;
 
-        public MatrixAnimationFrame(float roll, float pitch, float yaw)
+        public MatrixAnimationFrame(Matrix[] matrices)
         {
-            this.roll = roll;
-            this.pitch = pitch;
-            this.yaw = yaw;
+            Transforms = matrices;
         }
     }
 }

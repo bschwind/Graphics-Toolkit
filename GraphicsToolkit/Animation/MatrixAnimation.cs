@@ -21,7 +21,7 @@ namespace GraphicsToolkit.Animation
             return frames;
         }
 
-        public static MatrixAnimation ParseRollPitchYaw(string fileName)
+        public static MatrixAnimation Parse(string fileName)
         {
             //Read the file, create a new Animation object, return it
             StreamReader sr = new StreamReader(fileName);
@@ -31,11 +31,27 @@ namespace GraphicsToolkit.Animation
 
             while (line != null)
             {
-                string[] splitString = line.Split(',');
-                float roll = MathHelper.ToRadians(float.Parse(splitString[0]));
-                float pitch = MathHelper.ToRadians(float.Parse(splitString[1]));
-                float yaw = MathHelper.ToRadians(float.Parse(splitString[2]));
-                frames.Add(new MatrixAnimationFrame(roll, pitch, yaw));
+                string[] splitString = line.Split('\t');
+                int numMatrices = 2;
+                Matrix[] matrices = new Matrix[numMatrices];
+                for (int i = 0; i < numMatrices; i++)
+                {
+                    Matrix transform = Matrix.Identity;
+                    int offset = i * 9;
+                    transform.M11 = float.Parse(splitString[offset + 0]);
+                    transform.M12 = float.Parse(splitString[offset + 1]);
+                    transform.M13 = float.Parse(splitString[offset + 2]);
+                    transform.M21 = float.Parse(splitString[offset + 3]);
+                    transform.M22 = float.Parse(splitString[offset + 4]);
+                    transform.M23 = float.Parse(splitString[offset + 5]);
+                    transform.M31 = float.Parse(splitString[offset + 6]);
+                    transform.M32 = float.Parse(splitString[offset + 7]);
+                    transform.M33 = float.Parse(splitString[offset + 8]);
+                    matrices[i] = transform;
+                }
+
+                frames.Add(new MatrixAnimationFrame(matrices));
+                
                 line = sr.ReadLine();
             }
 
