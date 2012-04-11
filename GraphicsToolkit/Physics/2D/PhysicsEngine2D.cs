@@ -21,6 +21,9 @@ namespace GraphicsToolkit.Physics._2D
         private List<Constraint2D> constraints;
         private List<Contact2D> contacts = new List<Contact2D>();
         private Partition2D partition;
+        private float linearDamping = 0.001f;
+        private float angularDamping = 0.001f;
+        private int solverIterations = 1;
 
         public PhysicsEngine2D() : this(new GridPartition2D(Vector2.Zero, new Vector2(20, 10), 40, 40))
         {
@@ -66,7 +69,6 @@ namespace GraphicsToolkit.Physics._2D
         public void Update(GameTime g)
         {
             float dt = Math.Max((float)g.ElapsedGameTime.TotalSeconds, 1f / 60);
-            //merged = bodies[0].MotionBounds;
             //Apply gravity to each body
             //Also apply external forces here, such as player input
             foreach (RigidBody2D rb in bodies)
@@ -74,11 +76,15 @@ namespace GraphicsToolkit.Physics._2D
                 //Only apply to moving objects
                 if (rb.InvMass > 0)
                 {
+                    //Add damping factors
+                    rb.Force = rb.Force - (rb.Vel * linearDamping);
                     //Add in gravity, as well as any forces applied to our object
                     rb.Vel = rb.Vel + gravity + (rb.Force * rb.InvMass);
                 }
                 if (rb.InvInertia > 0)
                 {
+                    //Add damping factors
+                    rb.Torque = rb.Torque - (rb.RotVel * angularDamping);
                     rb.RotVel = rb.RotVel + (rb.Torque * rb.InvInertia);
                 }
 
@@ -95,11 +101,11 @@ namespace GraphicsToolkit.Physics._2D
             {
                 for (int j = 0; j < lines.Count; j++)
                 {
-                    contacts.Add(bodies[i].GenerateContact(lines[j], dt));
+                    bodies[i].AddContacts(lines[j], dt, ref contacts);
                 }
             }
 
-            Solver2D.Solve(contacts, 1, dt);
+            Solver2D.Solve(contacts, solverIterations, dt);
 
             foreach (Constraint2D c in constraints)
             {

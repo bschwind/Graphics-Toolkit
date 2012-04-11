@@ -19,8 +19,8 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             }
         }
 
-        public CircleBody(Vector2 pos, Vector2 vel, float mass, float radius)
-            : base(pos, vel, 0f, mass, 1f)
+        public CircleBody(Vector2 pos, Vector2 vel, float rotVel, float mass, float radius)
+            : base(pos, vel, rotVel, mass, (mass*radius*radius)/2f)
         {
             this.radius = radius;
         }
@@ -35,7 +35,12 @@ namespace GraphicsToolkit.Physics._2D.Bodies
             motionBounds = new AABB2D(center, halfExtents);
         }
 
-        public override Contact2D GenerateContact(RigidBody2D rb, float dt)
+        public override void PostIntegrationUpdate(Vector2 dx, float dRot)
+        {
+            //Do nothing
+        }
+
+        public override void AddContacts(RigidBody2D rb, float dt, ref List<Contact2D> contacts)
         {
             //Profiler says this method takes up a lot of processing time (AKA, it's run quite often)
             if (rb as CircleBody != null)
@@ -48,15 +53,22 @@ namespace GraphicsToolkit.Physics._2D.Bodies
                 Vector2 pa = this.Pos + normal * this.radius;
                 Vector2 pb = rb.Pos - normal * c.radius;
 
-                return new Contact2D(normal, dist, this, rb, pa, pb);
+                contacts.Add(new Contact2D(normal, dist, this, rb, pa, pb));
             }
             else if (rb as LineBody != null)
             {
                 LineBody pb = rb as LineBody;
-                return pb.GenerateContact(this, dt);
+                pb.AddContacts(this, dt, ref contacts);
             }
-            else
+            else if (rb as CompoundBody != null)
             {
+                CompoundBody cb = rb as CompoundBody;
+                foreach (CircleBody c in cb.Bodies)
+                {
+                    this.AddContacts(c, dt, ref contacts);
+                }
+            }
+            else {
                 throw new NotImplementedException();
             }
         }
