@@ -10,6 +10,7 @@ using GraphicsToolkit.Physics._3D.Bodies;
 using GraphicsToolkit.Physics._3D.Geometry;
 using GraphicsToolkit.Physics._3D.Partitions;
 using GraphicsToolkit.Physics._3D.Constraints;
+using GraphicsToolkit.Physics._3D.Controllers;
 
 namespace GraphicsToolkit.Physics._3D
 {
@@ -19,6 +20,7 @@ namespace GraphicsToolkit.Physics._3D
         private List<RigidBody3D> bodies;
         private List<RigidBody3D> lines;
         private List<Constraint3D> constraints;
+        private List<Controller3D> controllers;
         private List<Contact3D> contacts = new List<Contact3D>();
         private Partition3D partition;
 
@@ -32,6 +34,7 @@ namespace GraphicsToolkit.Physics._3D
             bodies = new List<RigidBody3D>();
             lines = new List<RigidBody3D>();
             constraints = new List<Constraint3D>();
+            controllers = new List<Controller3D>();
 
             //By default, use a grid partition
             partition = p;
@@ -67,6 +70,12 @@ namespace GraphicsToolkit.Physics._3D
         public void Update(GameTime g)
         {
             float dt = Math.Max((float)g.ElapsedGameTime.TotalSeconds, 1f / 60);
+
+            foreach (Controller3D controller in controllers)
+            {
+                controller.Update(dt);
+            }
+
             //merged = bodies[0].MotionBounds;
             //Apply gravity to each body
             //Also apply external forces here, such as player input
