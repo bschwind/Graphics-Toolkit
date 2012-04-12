@@ -52,6 +52,24 @@ namespace GraphicsToolkit.Networking
 
             Thread thread = new Thread(new ThreadStart(ListenForClients));
             thread.Start();
+
+            Thread udpThread = new Thread(new ThreadStart(ListenForUDP));
+            udpThread.Start();
+        }
+
+        private void ListenForUDP()
+        {
+            UdpClient client = new UdpClient(port);
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+            byte[] data;
+
+            while (true)
+            {
+                data = client.Receive(ref endPoint);
+                ASCIIEncoding encoder = new ASCIIEncoding();
+                string message = encoder.GetString(data, 0, data.Length);
+                Console.WriteLine(message);
+            }
         }
 
         private void ListenForClients()

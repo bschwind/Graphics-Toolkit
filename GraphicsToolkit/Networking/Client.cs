@@ -89,11 +89,11 @@ namespace GraphicsToolkit.Networking
             tcpClient.Close();
         }
 
-        public void AddToPacket(byte[] data)
+        public void AddToPacket(byte[] data, SendProtocol protocol)
         {
             if (buffer.CurrentWriteByteCount + data.Length > buffer.WriteBuffer.Length)
             {
-                FlushData();
+                FlushData(protocol);
             }
 
             Array.ConstrainedCopy(data, 0, buffer.WriteBuffer, buffer.CurrentWriteByteCount, data.Length);
@@ -101,17 +101,27 @@ namespace GraphicsToolkit.Networking
             buffer.CurrentWriteByteCount += data.Length;
         }
 
-        public void FlushData()
+        public void FlushData(SendProtocol protocol)
         {
-            clientStream.Write(buffer.WriteBuffer, 0, buffer.CurrentWriteByteCount);
-            clientStream.Flush();
+            if (protocol == SendProtocol.TCP)
+            {
+                clientStream.Write(buffer.WriteBuffer, 0, buffer.CurrentWriteByteCount);
+                clientStream.Flush();
+            }
+            else if (protocol == SendProtocol.UDP)
+            {
+                Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                sock.SendTo(buffer.WriteBuffer, buffer.CurrentWriteByteCount, SocketFlags.None, tcpClient.Client.RemoteEndPoint);
+                sock.Close();
+            }
+
             buffer.CurrentWriteByteCount = 0;
         }
 
-        public void SendImmediate(byte[] data)
+        public void SendImmediate(byte[] data, SendProtocol protocol)
         {
-            AddToPacket(data);
-            FlushData();
+            AddToPacket(data, protocol);
+            FlushData(protocol);
         }
 
         public bool IsConnected()
