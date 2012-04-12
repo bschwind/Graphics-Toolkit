@@ -5,23 +5,48 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace GraphicsToolkit.Networking
 {
-    public delegate void ServerHandlePacketData(byte[] data, int dataLength, TcpClient client);
+    public delegate void ServerHandlePacketData(byte[] data, int bytesRead, TcpClient client);
 
     public class Server
     {
-        TcpListener listener;
         public event ServerHandlePacketData OnDataReceived;
-        private Dictionary<TcpClient, NetworkBuffer> clientBuffers;
-        int sendBufferSize = 1024;
-        int readBufferSize = 1024;
+
+        private TcpListener listener;
+        private ConcurrentDictionary<TcpClient, NetworkBuffer> clientBuffers;
+        private List<TcpClient> clients;
+        private int sendBufferSize = 1024;
+        private int readBufferSize = 1024;
+        private int port;
+
+        public List<TcpClient> Clients
+        {
+            get
+            {
+                return clients;
+            }
+        }
+
+        public int NumClients
+        {
+            get
+            {
+                return clients.Count;
+            }
+        }
 
         public Server(int port)
         {
-            clientBuffers = new Dictionary<TcpClient, NetworkBuffer>();
+            this.port = port;
+            clientBuffers = new ConcurrentDictionary<TcpClient, NetworkBuffer>();
+            clients = new List<TcpClient>();
+        }
 
+        public void Start()
+        {
             listener = new TcpListener(IPAddress.Any, port);
             Console.WriteLine("Started server on port " + port);
 
@@ -43,15 +68,20 @@ namespace GraphicsToolkit.Networking
                 newBuff.WriteBuffer = new byte[sendBufferSize];
                 newBuff.ReadBuffer = new byte[readBufferSize];
                 newBuff.CurrentWriteByteCount = 0;
-                clientBuffers.Add(client, newBuff);
+                clientBuffers.GetOrAdd(client, newBuff);
+                clients.Add(client);
 
                 clientThread.Start(client);
+                Thread.Sleep(100);
             }
         }
 
         public void Disconnect()
         {
-            listener.Stop();
+            if (!listener.Pending())
+            {
+                listener.Stop();
+            }
         }
 
         private void WorkWithClient(object client)
@@ -59,11 +89,12 @@ namespace GraphicsToolkit.Networking
             TcpClient tcpClient = client as TcpClient;
             if (tcpClient == null)
             {
+                Console.WriteLine("TCP client is null, stopping processing for this client");
+                DisconnectClient(tcpClient);
                 return;
             }
 
             NetworkStream clientStream = tcpClient.GetStream();
-
             int bytesRead;
 
             while (true)
@@ -78,23 +109,40 @@ namespace GraphicsToolkit.Networking
                 catch
                 {
                     //a socket error has occurred
+                    Console.WriteLine("A socket error has occurred with client: " + tcpClient.ToString());
                     break;
                 }
 
                 if (bytesRead == 0)
                 {
                     //the client has disconnected from the server
-                    Console.WriteLine("Client has disconnected");
                     break;
                 }
 
                 if (OnDataReceived != null)
                 {
+                    //Send off the data for other classes to handle
                     OnDataReceived(clientBuffers[tcpClient].ReadBuffer, bytesRead, tcpClient);
                 }
             }
 
-            tcpClient.Close();
+            DisconnectClient(tcpClient);
+        }
+
+        private void DisconnectClient(TcpClient client)
+        {
+            if (client == null)
+            {
+                return;
+            }
+
+            Console.WriteLine("Disconnected client: " + client.ToString());
+
+            client.Close();
+
+            clients.Remove(client);
+            NetworkBuffer buffer;
+            clientBuffers.TryRemove(client, out buffer);
         }
 
         public void AddToPacket(byte[] data, TcpClient client)
