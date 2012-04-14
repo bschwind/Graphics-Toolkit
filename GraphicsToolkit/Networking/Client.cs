@@ -91,6 +91,8 @@ namespace GraphicsToolkit.Networking
                     //Send off the data for other classes to handle
                     OnDataReceived(buffer.ReadBuffer, bytesRead);
                 }
+
+                Thread.Sleep(15);
             }
 
             started = false;

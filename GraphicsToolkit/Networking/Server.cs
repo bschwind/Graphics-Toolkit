@@ -93,7 +93,7 @@ namespace GraphicsToolkit.Networking
                 clients.Add(client);
 
                 clientThread.Start(client);
-                Thread.Sleep(100);
+                Thread.Sleep(15);
             }
         }
 
@@ -154,6 +154,8 @@ namespace GraphicsToolkit.Networking
                     //Send off the data for other classes to handle
                     OnDataReceived(clientBuffers[tcpClient].ReadBuffer, bytesRead, tcpClient);
                 }
+
+                Thread.Sleep(15);
             }
 
             DisconnectClient(tcpClient);
