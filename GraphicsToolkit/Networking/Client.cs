@@ -105,6 +105,11 @@ namespace GraphicsToolkit.Networking
         /// <param name="data">The data to be sent</param>
         public void AddToPacket(byte[] data)
         {
+            if (!IsConnected())
+            {
+                return;
+            }
+
             if (buffer.CurrentWriteByteCount + data.Length > buffer.WriteBuffer.Length)
             {
                 FlushData();
@@ -119,6 +124,11 @@ namespace GraphicsToolkit.Networking
         /// </summary>
         public void FlushData()
         {
+            if (!IsConnected())
+            {
+                return;
+            }
+
             clientStream.Write(buffer.WriteBuffer, 0, buffer.CurrentWriteByteCount);
             clientStream.Flush();
             buffer.CurrentWriteByteCount = 0;
@@ -130,6 +140,11 @@ namespace GraphicsToolkit.Networking
         /// <param name="data"></param>
         public void SendImmediate(byte[] data)
         {
+            if (!IsConnected())
+            {
+                return;
+            }
+
             AddToPacket(data);
             FlushData();
         }
