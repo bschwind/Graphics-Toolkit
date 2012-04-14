@@ -11,6 +11,9 @@ namespace GraphicsToolkit.Networking
 {
     public delegate void ServerHandlePacketData(byte[] data, int bytesRead, TcpClient client);
 
+    /// <summary>
+    /// Implements a simple TCP server which uses one thread per client
+    /// </summary>
     public class Server
     {
         public event ServerHandlePacketData OnDataReceived;
@@ -21,7 +24,11 @@ namespace GraphicsToolkit.Networking
         private int sendBufferSize = 1024;
         private int readBufferSize = 1024;
         private int port;
+        private bool started = false;
 
+        /// <summary>
+        /// The list of currently connected clients
+        /// </summary>
         public List<TcpClient> Clients
         {
             get
@@ -30,6 +37,9 @@ namespace GraphicsToolkit.Networking
             }
         }
 
+        /// <summary>
+        /// The number of clients currently connected
+        /// </summary>
         public int NumClients
         {
             get
@@ -38,6 +48,10 @@ namespace GraphicsToolkit.Networking
             }
         }
 
+        /// <summary>
+        /// Constructs a new TCP server which will listen on a given port
+        /// </summary>
+        /// <param name="port"></param>
         public Server(int port)
         {
             this.port = port;
@@ -45,6 +59,9 @@ namespace GraphicsToolkit.Networking
             clients = new List<TcpClient>();
         }
 
+        /// <summary>
+        /// Begins listening on the port provided to the constructor
+        /// </summary>
         public void Start()
         {
             listener = new TcpListener(IPAddress.Any, port);
@@ -52,31 +69,17 @@ namespace GraphicsToolkit.Networking
 
             Thread thread = new Thread(new ThreadStart(ListenForClients));
             thread.Start();
-
-            Thread udpThread = new Thread(new ThreadStart(ListenForUDP));
-            udpThread.Start();
+            started = true;
         }
 
-        private void ListenForUDP()
-        {
-            UdpClient client = new UdpClient(port);
-            IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
-            byte[] data;
-
-            while (true)
-            {
-                data = client.Receive(ref endPoint);
-                ASCIIEncoding encoder = new ASCIIEncoding();
-                string message = encoder.GetString(data, 0, data.Length);
-                Console.WriteLine(message);
-            }
-        }
-
+        /// <summary>
+        /// Runs in its own thread. Responsible for accepting new clients and kicking them off into their own thread
+        /// </summary>
         private void ListenForClients()
         {
             listener.Start();
 
-            while (true)
+            while (started)
             {
                 TcpClient client = listener.AcceptTcpClient();
                 Thread clientThread = new Thread(new ParameterizedThreadStart(WorkWithClient));
@@ -94,14 +97,23 @@ namespace GraphicsToolkit.Networking
             }
         }
 
-        public void Disconnect()
+        /// <summary>
+        /// Stops the server from accepting new clients
+        /// </summary>
+        public void Stop()
         {
             if (!listener.Pending())
             {
                 listener.Stop();
+                started = false;
             }
         }
 
+        /// <summary>
+        /// This method lives on a thread, one per client. Responsible for reading data from the client
+        /// and pushing the data off to classes listening to the server.
+        /// </summary>
+        /// <param name="client"></param>
         private void WorkWithClient(object client)
         {
             TcpClient tcpClient = client as TcpClient;
@@ -115,7 +127,7 @@ namespace GraphicsToolkit.Networking
             NetworkStream clientStream = tcpClient.GetStream();
             int bytesRead;
 
-            while (true)
+            while (started)
             {
                 bytesRead = 0;
 
@@ -147,6 +159,10 @@ namespace GraphicsToolkit.Networking
             DisconnectClient(tcpClient);
         }
 
+        /// <summary>
+        /// Removes a given client from our list of clients
+        /// </summary>
+        /// <param name="client"></param>
         private void DisconnectClient(TcpClient client)
         {
             if (client == null)
@@ -163,6 +179,11 @@ namespace GraphicsToolkit.Networking
             clientBuffers.TryRemove(client, out buffer);
         }
 
+        /// <summary>
+        /// Adds data to the packet to be sent out, but does not send it across the network
+        /// </summary>
+        /// <param name="data">The data to be sent</param>
+        /// <param name="client">The client to send the data to</param>
         public void AddToPacket(byte[] data, TcpClient client)
         {
             if (clientBuffers[client].CurrentWriteByteCount + data.Length > clientBuffers[client].WriteBuffer.Length)
@@ -175,6 +196,33 @@ namespace GraphicsToolkit.Networking
             clientBuffers[client].CurrentWriteByteCount += data.Length;
         }
 
+        /// <summary>
+        /// Adds data to the packet to be sent out, but does not send it across the network. This
+        /// data gets sent to every connected client
+        /// </summary>
+        /// <param name="data">The data to be sent</param>
+        public void AddToPacketToAll(byte[] data)
+        {
+            lock (clients)
+            {
+                foreach (TcpClient client in clients)
+                {
+                    if (clientBuffers[client].CurrentWriteByteCount + data.Length > clientBuffers[client].WriteBuffer.Length)
+                    {
+                        FlushData(client);
+                    }
+
+                    Array.ConstrainedCopy(data, 0, clientBuffers[client].WriteBuffer, clientBuffers[client].CurrentWriteByteCount, data.Length);
+
+                    clientBuffers[client].CurrentWriteByteCount += data.Length;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flushes all outgoing data to the specified client
+        /// </summary>
+        /// <param name="client"></param>
         private void FlushData(TcpClient client)
         {
             client.GetStream().Write(clientBuffers[client].WriteBuffer, 0, clientBuffers[client].CurrentWriteByteCount);
@@ -182,10 +230,47 @@ namespace GraphicsToolkit.Networking
             clientBuffers[client].CurrentWriteByteCount = 0;
         }
 
-        public void SendData(byte[] data, TcpClient client)
+        /// <summary>
+        /// Flushes all outgoing data to every client
+        /// </summary>
+        private void FlushDataToAll()
+        {
+            lock (clients)
+            {
+                foreach (TcpClient client in clients)
+                {
+                    client.GetStream().Write(clientBuffers[client].WriteBuffer, 0, clientBuffers[client].CurrentWriteByteCount);
+                    client.GetStream().Flush();
+                    clientBuffers[client].CurrentWriteByteCount = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends the byte array data immediately to the specified client
+        /// </summary>
+        /// <param name="data">The data to be sent</param>
+        /// <param name="client">The client to send the data to</param>
+        public void SendImmediate(byte[] data, TcpClient client)
         {
             AddToPacket(data, client);
             FlushData(client);
+        }
+
+        /// <summary>
+        /// Sends the byte array data immediately to all clients
+        /// </summary>
+        /// <param name="data">The data to be sent</param>
+        public void SendImmediateToAll(byte[] data)
+        {
+            lock (clients)
+            {
+                foreach (TcpClient client in clients)
+                {
+                    AddToPacket(data, client);
+                    FlushData(client);
+                }
+            }
         }
     }
 }
