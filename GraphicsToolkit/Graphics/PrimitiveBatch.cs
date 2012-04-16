@@ -546,6 +546,9 @@ namespace GraphicsToolkit.Graphics
 
             device.SetVertexBuffer(mesh.Vertices);
             device.Indices = mesh.Indices;
+
+            device.BlendState = BlendState.AlphaBlend;
+
             effect.View = cam.View;
             effect.Projection = cam.Projection;
             effect.World = world;
@@ -558,7 +561,6 @@ namespace GraphicsToolkit.Graphics
             }
             effect.PreferPerPixelLighting = true;
             effect.EnableDefaultLighting();
-
             effect.CurrentTechnique.Passes[0].Apply();
             int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
             int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
@@ -576,6 +578,49 @@ namespace GraphicsToolkit.Graphics
             effect.LightingEnabled = false;
             effect.World = previousWorld;
             effect.TextureEnabled = false;
+            //effect.PreferPerPixelLighting = false;
+        }
+
+        public void DrawMesh(Mesh mesh, Matrix world, Camera cam, float alpha)
+        {
+            Matrix previousWorld = effect.World;
+
+            device.SetVertexBuffer(mesh.Vertices);
+            device.Indices = mesh.Indices;
+
+            device.BlendState = BlendState.AlphaBlend;
+            effect.Alpha = alpha;
+            effect.View = cam.View;
+            effect.Projection = cam.Projection;
+            effect.World = world;
+            effect.VertexColorEnabled = false;
+            effect.TextureEnabled = false;
+            if (mesh.Texture != null)
+            {
+                effect.Texture = mesh.Texture;
+                effect.TextureEnabled = true;
+            }
+            effect.PreferPerPixelLighting = true;
+            effect.EnableDefaultLighting();
+            effect.CurrentTechnique.Passes[0].Apply();
+            int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
+            int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
+            int offset = 0;
+            for (int i = 0; i < passes; i++)
+            {
+                device.DrawPrimitives(PrimitiveType.TriangleList, offset, maxVertsPerDraw / numVertsPerPrimitive(PrimitiveType.TriangleList));
+                offset += maxVertsPerDraw;
+            }
+
+            //device.DrawPrimitives(PrimitiveType.TriangleList, offset, remainder / numVertsPerPrimitive(PrimitiveType.TriangleList));
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3);
+
+            effect.VertexColorEnabled = true;
+            effect.LightingEnabled = false;
+            effect.World = previousWorld;
+            effect.TextureEnabled = false;
+            effect.Alpha = 1;
+            //device.BlendState = BlendState.Opaque;
             //effect.PreferPerPixelLighting = false;
         }
 
