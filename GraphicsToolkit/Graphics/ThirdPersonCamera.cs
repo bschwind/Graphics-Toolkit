@@ -117,7 +117,7 @@ namespace GraphicsToolkit.Graphics
             mouseDelta = new Vector2(dx, dy);
 
             xRot -= dy *  rotSpeed * dt;
-            xRot = MathHelper.Clamp(xRot, -MathHelper.PiOver2, MathHelper.PiOver2);
+            xRot = MathHelper.Clamp(xRot, -MathHelper.PiOver2 + 0.1f, MathHelper.PiOver2 - 0.1f); //Limit how far above and below the camera can go
             yRot -= dx * rotSpeed * dt;
             yRot = Math.Sign(yRot) * Math.Abs(yRot % MathHelper.TwoPi);
             rotation = Matrix.CreateRotationX(xRot) * Matrix.CreateRotationY(yRot);
