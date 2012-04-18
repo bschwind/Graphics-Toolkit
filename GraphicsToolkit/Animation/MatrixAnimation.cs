@@ -10,9 +10,11 @@ namespace GraphicsToolkit.Animation
     public class MatrixAnimation
     {
         private List<MatrixAnimationFrame> frames;
+        private int numBodies;
 
-        public MatrixAnimation(List<MatrixAnimationFrame> frames)
+        public MatrixAnimation(List<MatrixAnimationFrame> frames, int numBodies)
         {
+            this.numBodies = numBodies;
             this.frames = frames;
         }
 
@@ -21,23 +23,37 @@ namespace GraphicsToolkit.Animation
             return frames;
         }
 
+        public int NumBodies()
+        {
+            return numBodies;
+        }
+
         public static MatrixAnimation Parse(string fileName)
         {
             //Read the file, create a new Animation object, return it
             StreamReader sr = new StreamReader(fileName);
-            string line = sr.ReadLine();
 
             List<MatrixAnimationFrame> frames = new List<MatrixAnimationFrame>();
 
+            string numFramesString = sr.ReadLine();
+            int numFrames = int.Parse(numFramesString.Split('\t')[1]);
+
+            flushLines(sr, 1);
+
+            string numMatricesString = sr.ReadLine();
+            int numMatrices = int.Parse(numMatricesString.Split('\t')[1]);
+
+            flushLines(sr, 8);
+
+            string line = sr.ReadLine();
             while (line != null)
             {
                 string[] splitString = line.Split('\t');
-                int numMatrices = 2;
                 Matrix[] matrices = new Matrix[numMatrices];
                 for (int i = 0; i < numMatrices; i++)
                 {
                     Matrix transform = Matrix.Identity;
-                    int offset = i * 9;
+                    int offset = i * 17 + 9;
                     transform.M11 = float.Parse(splitString[offset + 0]);
                     transform.M12 = float.Parse(splitString[offset + 1]);
                     transform.M13 = float.Parse(splitString[offset + 2]);
@@ -57,7 +73,15 @@ namespace GraphicsToolkit.Animation
 
             sr.Close();
 
-            return new MatrixAnimation(frames);
+            return new MatrixAnimation(frames, numMatrices);
+        }
+
+        private static void flushLines(StreamReader sr, int numLines)
+        {
+            for (int i = 0; i < numLines; i++)
+            {
+                sr.ReadLine();
+            }
         }
     }
 }
