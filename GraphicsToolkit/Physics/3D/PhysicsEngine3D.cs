@@ -22,6 +22,18 @@ namespace GraphicsToolkit.Physics._3D
         private List<Contact3D> contacts = new List<Contact3D>();
         private Partition3D partition;
 
+        public Vector3 Gravity
+        {
+            get
+            {
+                return gravity;
+            }
+            set
+            {
+                gravity = value;
+            }
+        }
+
         public PhysicsEngine3D() : this(new GridPartition3D(Vector3.Zero, new Vector3(20, 10, 10), 2, 2, 2))
         {
 
@@ -85,6 +97,8 @@ namespace GraphicsToolkit.Physics._3D
 
                 rb.ClearForces();
                 rb.GenerateMotionAABB(dt);
+
+                rb.InContact = false;
             }
 
             //Detect and resolve contacts

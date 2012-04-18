@@ -14,6 +14,7 @@ namespace GraphicsToolkit.Physics._3D.Bodies
         private Vector3 vel;
         private float invMass;
         private Vector3 force;
+        private Vector3 normal;
 
         //Rotational properties
         private float rot;
@@ -21,8 +22,34 @@ namespace GraphicsToolkit.Physics._3D.Bodies
         private float invInertia;
         private float torque;
 
+        private bool inContact;
+
         //Intersection properties
         protected AABB3D motionBounds;
+
+        public Vector3 Normal
+        {
+            get
+            {
+                return normal;
+            }
+            set
+            {
+                normal = value;
+            }
+        }
+
+        public bool InContact
+        {
+            get
+            {
+                return inContact;
+            }
+            set
+            {
+                inContact = value;
+            }
+        }
 
         public Vector3 Pos
         {
