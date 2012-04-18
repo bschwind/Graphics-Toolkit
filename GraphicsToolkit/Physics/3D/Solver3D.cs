@@ -22,7 +22,6 @@ namespace GraphicsToolkit.Physics._3D
                 {
                     Contact3D con = contacts[i];
                     Vector3 n = con.Normal;
-
                     float relNv = Vector3.Dot(con.B.Vel - con.A.Vel, n);
 
                     //Do either speculative or speculative sequential
@@ -35,6 +34,14 @@ namespace GraphicsToolkit.Physics._3D
                             float mag = remove / (con.A.InvMass + con.B.InvMass);
                             Vector3 imp = con.Normal * mag;
                             con.ApplyImpulses(imp);
+                            con.A.InContact = true;
+                            con.B.InContact = true;
+
+
+                            con.A.Normal = con.Normal;
+                            con.B.Normal = con.Normal;
+
+
                             //Vector3 aVel = con.A.GetVelocityOfPoint(con.pointA);
                             //Vector3 bVel = con.B.GetVelocityOfPoint(con.pointB);
                             //Vector3 relVel = bVel - aVel;
