@@ -14,10 +14,12 @@ namespace GraphicsToolkit.GUI
         private List<Texture2D> panelTextures;
         private SpriteBatch spriteBatch;
         private bool hasLaoded = false;
+        private Game game;
 
         public GUIManager(Game g, GraphicsDeviceManager gManager)
             : base(g)
         {
+            this.game = g;
             panels = new List<Panel>();
             panelTextures = new List<Texture2D>();
             g.Window.AllowUserResizing = true;
@@ -78,6 +80,10 @@ namespace GraphicsToolkit.GUI
             foreach (Panel p in panels)
             {
                 p.Update(gameTime);
+                if (p.ExitDesired)
+                {
+                    Environment.Exit(0);
+                }
             }
         }
 

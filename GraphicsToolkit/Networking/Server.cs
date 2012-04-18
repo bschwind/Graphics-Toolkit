@@ -165,7 +165,7 @@ namespace GraphicsToolkit.Networking
         /// Removes a given client from our list of clients
         /// </summary>
         /// <param name="client"></param>
-        private void DisconnectClient(TcpClient client)
+        public void DisconnectClient(TcpClient client)
         {
             if (client == null)
             {

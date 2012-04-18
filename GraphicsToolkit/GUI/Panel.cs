@@ -14,6 +14,20 @@ namespace GraphicsToolkit.GUI
         protected Vector2 upperLeft, bottomRight;
         protected int x, y, width, height;
         private Viewport viewPort;
+        protected bool exitDesired = false;
+
+        public bool ExitDesired
+        {
+            get
+            {
+                return exitDesired;
+            }
+            set
+            {
+                exitDesired = value;
+            }
+        }
+
 
         public Viewport ViewPort
         {
