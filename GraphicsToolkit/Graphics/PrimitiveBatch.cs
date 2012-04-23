@@ -561,6 +561,15 @@ namespace GraphicsToolkit.Graphics
             }
             effect.PreferPerPixelLighting = true;
             effect.EnableDefaultLighting();
+
+            //Custom Effect:
+            effect.SpecularColor = new Vector3(.025f, .05f, .025f);
+            effect.EmissiveColor = new Vector3(0.02f, 0.02f, 0.02f);
+            effect.FogEnabled = true;
+            effect.FogEnd = 35f;
+            effect.FogColor = new Vector3(.025f, .05f, .025f);
+            //End custom effect
+
             effect.CurrentTechnique.Passes[0].Apply();
             int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
             int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
@@ -595,6 +604,15 @@ namespace GraphicsToolkit.Graphics
             effect.World = world;
             effect.VertexColorEnabled = false;
             effect.TextureEnabled = false;
+
+            //Custom Effect:
+            effect.SpecularColor = new Vector3(.025f, .05f, .025f);
+            effect.EmissiveColor = new Vector3(0.02f, 0.02f, 0.02f);
+            effect.FogEnabled = true;
+            effect.FogEnd = 35f;
+            effect.FogColor = new Vector3(.025f, .05f, .025f);
+            //End custom effect
+
             if (mesh.Texture != null)
             {
                 effect.Texture = mesh.Texture;
