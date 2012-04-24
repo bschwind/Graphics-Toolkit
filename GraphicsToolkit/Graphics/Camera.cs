@@ -34,6 +34,10 @@ namespace GraphicsToolkit.Graphics
             {
                 return projection;
             }
+            set
+            {
+                projection = value;
+            }
         }
 
         public Vector3 Pos
