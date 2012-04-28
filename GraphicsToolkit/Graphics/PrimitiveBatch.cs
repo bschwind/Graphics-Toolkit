@@ -540,6 +540,37 @@ namespace GraphicsToolkit.Graphics
             device.DrawPrimitives(primType, offset, remainder / numVertsPerPrimitive(primType));
         }
 
+        public void DrawMesh(Mesh mesh, Matrix world, Camera cam, Effect customEffect)
+        {
+            device.SetVertexBuffer(mesh.Vertices);
+            device.Indices = mesh.Indices;
+
+            device.BlendState = BlendState.AlphaBlend;
+
+            customEffect.Parameters["View"].SetValue(cam.View);
+            customEffect.Parameters["Projection"].SetValue(cam.Projection);
+            customEffect.Parameters["World"].SetValue(world);
+
+            if (mesh.Texture != null)
+            {
+                customEffect.Parameters["Texture"].SetValue(mesh.Texture);
+                customEffect.Parameters["NormalMap"].SetValue(mesh.NormalMap);
+            }
+
+
+            customEffect.CurrentTechnique.Passes[0].Apply();
+            int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
+            int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
+            int offset = 0;
+            for (int i = 0; i < passes; i++)
+            {
+                device.DrawPrimitives(PrimitiveType.TriangleList, offset, maxVertsPerDraw / numVertsPerPrimitive(PrimitiveType.TriangleList));
+                offset += maxVertsPerDraw;
+            }
+
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3);
+        }
+
         public void DrawMesh(Mesh mesh, Matrix world, Camera cam)
         {
             Matrix previousWorld = effect.World;

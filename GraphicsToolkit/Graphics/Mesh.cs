@@ -11,7 +11,7 @@ namespace GraphicsToolkit.Graphics
     {
         public VertexBuffer Vertices;
         public IndexBuffer Indices;
-        public Texture2D Texture;
+        public Texture2D Texture, NormalMap;
 
         public BoundingSphere CalculateBounds()
         {
