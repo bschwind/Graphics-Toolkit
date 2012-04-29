@@ -202,5 +202,11 @@ namespace GraphicsToolkit.Physics._3D.Bodies
             //TODO: Calculate proper velocity in 3D
             return this.vel; // +(rotVel * GameMath.Perp2D(p - this.pos));
         }
+
+        public Vector3 GetVelocityOfWorldPoint(Vector3 p)
+        {
+            //TODO: Calculate proper velocity in 3D
+            return this.vel;
+        }
     }
 }

@@ -37,22 +37,37 @@ namespace GraphicsToolkit.Physics._3D
                             con.A.InContact = true;
                             con.B.InContact = true;
 
-
                             con.A.Normal = con.Normal;
                             con.B.Normal = con.Normal;
-
-
-                            //Vector3 aVel = con.A.GetVelocityOfPoint(con.pointA);
-                            //Vector3 bVel = con.B.GetVelocityOfPoint(con.pointB);
-                            //Vector3 relVel = bVel - aVel;
-                            //con.B.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
-                            //con.A.AddForce(relVel * (con.A.InvMass + con.B.InvMass));
-                            //con.ApplyImpulses(relVel / (con.A.InvMass + con.B.InvMass));
                         }
                     }
                     else
                     {
-                        //Do sequential...later
+                        Vector3 aVel = con.A.GetVelocityOfWorldPoint(con.pointA);
+                        Vector3 bVel = con.B.GetVelocityOfWorldPoint(con.pointB);
+                        Vector3 relVel = bVel - aVel;
+
+                        float remove = relNv + con.Dist * dtInv;
+
+                        //float mag = remove * con.InvDenom;
+                        float mag = remove * (1/(con.A.InvMass + con.B.InvMass));
+                        float newImpulse = Math.Min(mag + con.ImpulseN, 0);
+                        float change = newImpulse - con.ImpulseN;
+
+                        if (change < 0.0f)
+                        {
+                            con.A.InContact = true;
+                            con.B.InContact = true;
+
+                            con.A.Normal = con.Normal;
+                            con.B.Normal = con.Normal;
+                        }
+
+                        Vector3 imp = con.Normal * change;
+
+                        // apply impulse
+                        con.ApplyImpulses(imp);
+                        con.ImpulseN = newImpulse;
                     }
                 }
             }

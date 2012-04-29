@@ -12,7 +12,7 @@ namespace GraphicsToolkit.Physics._3D.Bodies
         private Vector3 normal;
         private Vector3 p;
 
-        public Vector3 Normal
+        public Vector3 PlaneNormal
         {
             get
             {

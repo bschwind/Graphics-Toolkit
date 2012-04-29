@@ -44,6 +44,11 @@ namespace GraphicsToolkit.Physics._3D.Geometry
             return new AABB3D(pos, halfExtents);
         }
 
+        public static AABB3D CreateFromSphere(Sphere s)
+        {
+            return new AABB3D(s.Pos, new Vector3(s.Radius, s.Radius, s.Radius));
+        }
+
         public static AABB3D CreateFromPoints(Vector3[] points)
         {
             Vector3 min = points[0];

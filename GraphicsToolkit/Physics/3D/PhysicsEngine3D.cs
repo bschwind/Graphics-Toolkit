@@ -98,7 +98,7 @@ namespace GraphicsToolkit.Physics._3D
                 rb.ClearForces();
                 rb.GenerateMotionAABB(dt);
 
-                rb.InContact = false;
+                //rb.InContact = false;
             }
 
             //Detect and resolve contacts
@@ -108,6 +108,7 @@ namespace GraphicsToolkit.Physics._3D
 
             for (int i = 0; i < bodies.Count; i++)
             {
+                bodies[i].InContact = false;
                 for (int j = 0; j < lines.Count; j++)
                 {
                     contacts.Add(bodies[i].GenerateContact(lines[j], dt));

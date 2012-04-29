@@ -12,7 +12,7 @@ namespace GraphicsToolkit.Physics._3D
         public Vector3 Normal;
         public Vector3 pointA, pointB;
         public float Dist;
-        public float Impulse;
+        public float ImpulseN;
         public RigidBody3D A, B;
 
         public static Random rand = new Random();
@@ -30,7 +30,7 @@ namespace GraphicsToolkit.Physics._3D
 
             //I = (1+e)*N*(Vr • N) / (1/Ma + 1/Mb)
             //Impulse = (Vector3.Dot(b.Vel - a.Vel, normal) / (a.InvMass + b.InvMass));
-            Impulse = 0;
+            ImpulseN = 0;
         }
 
         public void ApplyImpulses(Vector3 imp)
