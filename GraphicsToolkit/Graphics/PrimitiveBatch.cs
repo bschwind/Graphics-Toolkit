@@ -32,6 +32,16 @@ namespace GraphicsToolkit.Graphics
         bool hasBegun = false;
         PrimitiveType currentType;
 
+        // To store instance transform matrices in a vertex buffer, we use this custom
+        // vertex type which encodes 4x4 matrices as a set of four Vector4 values.
+        static VertexDeclaration instanceVertexDeclaration = new VertexDeclaration
+        (
+            new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0),
+            new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 1),
+            new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 2),
+            new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 3)
+        );
+
         public GraphicsDevice Device
         {
             get
@@ -538,6 +548,45 @@ namespace GraphicsToolkit.Graphics
             }
 
             device.DrawPrimitives(primType, offset, remainder / numVertsPerPrimitive(primType));
+        }
+
+        public void DrawInstancedMesh(Mesh mesh, Camera cam, Effect customEffect, VertexBuffer instanceVertBuffer)
+        {
+            device.SetVertexBuffers(
+                        new VertexBufferBinding(mesh.Vertices, 0, 0),
+                        new VertexBufferBinding(instanceVertBuffer, 0, 1));
+
+            //device.SetVertexBuffer(mesh.Vertices);
+            device.Indices = mesh.Indices;
+
+            device.BlendState = BlendState.AlphaBlend;
+
+            customEffect.CurrentTechnique = customEffect.Techniques["NormalMappingInstancing"];
+
+            customEffect.Parameters["View"].SetValue(cam.View);
+            customEffect.Parameters["Projection"].SetValue(cam.Projection);
+            //customEffect.Parameters["World"].SetValue(world);
+
+            if (mesh.Texture != null)
+            {
+                customEffect.Parameters["Texture"].SetValue(mesh.Texture);
+                customEffect.Parameters["NormalMap"].SetValue(mesh.NormalMap);
+            }
+
+
+            customEffect.CurrentTechnique.Passes[0].Apply();
+            int passes = mesh.Vertices.VertexCount / maxVertsPerDraw;
+            int remainder = mesh.Vertices.VertexCount % maxVertsPerDraw;
+            int offset = 0;
+            for (int i = 0; i < passes; i++)
+            {
+                //device.DrawPrimitives(PrimitiveType.TriangleList, offset, maxVertsPerDraw / numVertsPerPrimitive(PrimitiveType.TriangleList));
+                device.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3, instanceVertBuffer.VertexCount);
+                offset += maxVertsPerDraw;
+            }
+
+            //device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3);
+            device.DrawInstancedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.Vertices.VertexCount, 0, mesh.Indices.IndexCount / 3, instanceVertBuffer.VertexCount);
         }
 
         public void DrawMesh(Mesh mesh, Matrix world, Camera cam, Effect customEffect)
